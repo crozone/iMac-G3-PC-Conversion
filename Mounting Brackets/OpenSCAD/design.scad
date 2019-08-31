@@ -29,6 +29,8 @@ SEM = 0.0000001;
 //
 
 
+plate_thickness = 2.5; // motherboard thickness
+
 top_spacing = 5;
 post_diameter = 8 + 1; // 1mm tolerence
 post_channel_length = 2 + 1; // 1mm telerence
@@ -94,7 +96,7 @@ module motherboard() {
     translate([-motherboard_width / 2, 0, 0])
     union() {
         union() {
-            plate_thickness = 2.5;
+            
             lip_thickness = 4;
             
             // Motherboard baseplate
@@ -207,10 +209,10 @@ module upper_mobo_mount() {
             translate([-width_spacing / 2 - 58.25, 0, 0])
                 union() {
                     translate([0, top_offset - SEM, - SEM])
-                    #cube([post_channel_width, 10 + 2 * SEM, box_height + SEM * 2]);
+                    cube([post_channel_width, 10 + 2 * SEM, box_height + SEM * 2]);
                     
                     translate([0, top_offset - SEM, (box_height - shim_depth_offset) - SEM])
-                    #cube([post_channel_width, 24 + 2 * SEM, shim_depth_offset + SEM * 2]);
+                    cube([post_channel_width, 24 + 2 * SEM, shim_depth_offset + SEM * 2]);
                     
                 }
         }
@@ -220,12 +222,12 @@ module upper_mobo_mount() {
 module baseplate_screwhole() {
     translate([0, 0, 0])
     union() {
-        translate([0, 0, 10])
+        translate([0, 0, 12])
         hole(4, 20);
         
         hole(2, 40);
         
-        translate([0, 0, -11])
+        translate([0, 0, -10])
         hole(3, 20); // post diameter is 5mm, so this has 1mm tolerence in diameter
     }
 }
@@ -234,14 +236,14 @@ module lower_left_mobo_mount() {
     screw_trim = 10; // minimum space around each screw hole
     
     screw_a_x_dist = 12; // distance from right screw to mobo edge
-    screw_a_y_dist = 30; // distance from right screw to mobo front
+    screw_a_y_dist = plate_thickness + 33; // distance from right screw to mobo front + mobo thickness
     
-    screw_b_x_dist = -112; // distance from right screw to mobo edge
-    screw_b_y_dist = 45; // distance from right screw to mobo front
+    screw_b_x_dist = -111; // distance from right screw to mobo edge
+    screw_b_y_dist = plate_thickness + 46; // distance from right screw to mobo front + mobo thickness
     
     edge_x_lip = max(screw_a_x_dist, screw_b_x_dist) + screw_trim;
     
-    mobo_baseplate_height_offset = 11.5; // distance between the bottom edge of the mobo and base plate
+    mobo_baseplate_height_offset = 12.5; // distance between the bottom edge of the mobo and base plate
     baseplate_post_height = 7;
     lmount_post_height_offset = baseplate_post_height - mobo_baseplate_height_offset;
     
@@ -249,19 +251,15 @@ module lower_left_mobo_mount() {
     lmount_width = abs(min(screw_a_x_dist, screw_b_x_dist)) + screw_trim + edge_x_lip;
     //lmount_height = 85 + 15;
     lmount_height = mobo_baseplate_height_offset + 10 + screw_trim;
-    lmount_thickness = 10 + 10;
+    lmount_thickness = 10;
     
     lmount_base_depth = max(screw_a_y_dist, screw_b_y_dist) + screw_trim;
-    
-    
     
     difference() {
         translate([0, 0, -mobo_baseplate_height_offset])
         union() {
-            translate([-edge_x_lip, -5, 0])
-            cube([lmount_width, lmount_thickness, lmount_height]);
-            translate([-edge_x_lip, 0, 0])
-            #cube([lmount_width, lmount_base_depth, mobo_baseplate_height_offset]);
+            translate([-edge_x_lip, -lmount_thickness, 0])
+            cube_round(lmount_width, lmount_base_depth + lmount_thickness, lmount_height, 3);
         }
         
         translate([-screw_a_x_dist, screw_a_y_dist, lmount_post_height_offset])
