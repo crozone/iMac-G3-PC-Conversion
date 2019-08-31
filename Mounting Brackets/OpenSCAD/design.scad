@@ -7,9 +7,9 @@
 // Part selection
 //
 
-enable_top_mount = true;
+enable_top_mount = false;
 enable_bottem_left_mount = true;
-enable_bottom_right_mount = true;
+enable_bottom_right_mount = false;
 
 //
 // Constants
@@ -226,32 +226,47 @@ module baseplate_screwhole() {
         hole(2, 40);
         
         translate([0, 0, -11])
-        hole(3, 20); // post diameter is 5mm
+        hole(3, 20); // post diameter is 5mm, so this has 1mm tolerence in diameter
     }
 }
 
 module lower_left_mobo_mount() {
-    
+    screw_trim = 10; // minimum space around each screw hole
     
     screw_a_x_dist = 12; // distance from right screw to mobo edge
     screw_a_y_dist = 30; // distance from right screw to mobo front
     
-    edge_x_lip = screw_a_x_dist + 10;
+    screw_b_x_dist = -112; // distance from right screw to mobo edge
+    screw_b_y_dist = 45; // distance from right screw to mobo front
     
-    lmount_width = 85 + edge_x_lip;
-    lmount_height = 85 + 15;
+    edge_x_lip = max(screw_a_x_dist, screw_b_x_dist) + screw_trim;
+    
+    mobo_baseplate_height_offset = 11.5; // distance between the bottom edge of the mobo and base plate
+    baseplate_post_height = 7;
+    lmount_post_height_offset = baseplate_post_height - mobo_baseplate_height_offset;
+    
+    //lmount_width = 85 + edge_x_lip;
+    lmount_width = abs(min(screw_a_x_dist, screw_b_x_dist)) + screw_trim + edge_x_lip;
+    //lmount_height = 85 + 15;
+    lmount_height = mobo_baseplate_height_offset + 10 + screw_trim;
     lmount_thickness = 10 + 10;
     
-    translate([0, 0, -15])
+    lmount_base_depth = max(screw_a_y_dist, screw_b_y_dist) + screw_trim;
+    
+    
+    
     difference() {
+        translate([0, 0, -mobo_baseplate_height_offset])
         union() {
             translate([-edge_x_lip, -5, 0])
             cube([lmount_width, lmount_thickness, lmount_height]);
             translate([-edge_x_lip, 0, 0])
-            cube([lmount_width, screw_a_y_dist + 10, 15]);
+            #cube([lmount_width, lmount_base_depth, mobo_baseplate_height_offset]);
         }
         
-        translate([-screw_a_x_dist, screw_a_y_dist, 15])
+        translate([-screw_a_x_dist, screw_a_y_dist, lmount_post_height_offset])
+        #baseplate_screwhole();
+        translate([-screw_b_x_dist, screw_b_y_dist, lmount_post_height_offset])
         #baseplate_screwhole();
     }
 }
