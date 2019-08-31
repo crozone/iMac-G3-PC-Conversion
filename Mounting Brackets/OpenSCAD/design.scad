@@ -92,6 +92,7 @@ module motherboard_screwhole() {
 module motherboard() {
     motherboard_width=241;
     motherboard_height=241;
+    motherboard_keepout_depth = 120;
     
     translate([-motherboard_width / 2, 0, 0])
     union() {
@@ -107,14 +108,14 @@ module motherboard() {
             cube([motherboard_width - 4, lip_thickness + 2 * SEM, motherboard_height - 4]);
             
             // Keep Out Zone for motherboard
-            keep_out_depth = 100 - plate_thickness - lip_thickness;
+            keep_out_depth = motherboard_keepout_depth - plate_thickness - lip_thickness;
             
-            translate([0, plate_thickness + lip_thickness - SEM, -1])
-            cube([motherboard_width, keep_out_depth + 2 * SEM, motherboard_height + 3]);
+            translate([0, plate_thickness + lip_thickness - SEM, -3])
+            cube([motherboard_width, keep_out_depth + 2 * SEM, motherboard_height + 5]);
             
             // GPU/PCIe card Keep Out
-            translate([-50, plate_thickness + lip_thickness, -1])
-            cube([50, keep_out_depth, 90]);
+            translate([-50, plate_thickness + lip_thickness, -3])
+            cube([50, keep_out_depth, 95]);
         }
         
         translate([0, -20 + 0.1, 0])
@@ -243,13 +244,11 @@ module lower_left_mobo_mount() {
     
     edge_x_lip = max(screw_a_x_dist, screw_b_x_dist) + screw_trim;
     
-    mobo_baseplate_height_offset = 12.5; // distance between the bottom edge of the mobo and base plate
-    baseplate_post_height = 7;
+    mobo_baseplate_height_offset = 15; // distance between the bottom edge of the mobo and base plate
+    baseplate_post_height = 7.5;
     lmount_post_height_offset = baseplate_post_height - mobo_baseplate_height_offset;
     
-    //lmount_width = 85 + edge_x_lip;
     lmount_width = abs(min(screw_a_x_dist, screw_b_x_dist)) + screw_trim + edge_x_lip;
-    //lmount_height = 85 + 15;
     lmount_height = mobo_baseplate_height_offset + 10 + screw_trim;
     lmount_thickness = 10;
     
@@ -290,7 +289,7 @@ difference() {
     
     }
     
-    motherboard();
+    #motherboard();
 }
 
 
