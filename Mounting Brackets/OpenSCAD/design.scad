@@ -7,11 +7,11 @@
 // Part selection
 //
 
-enable_top_mount = false;
+enable_top_mount = true;
 enable_bottem_left_mount = true;
-enable_bottom_right_mount = false;
+enable_bottom_right_mount = true;
 
-enable_display_holders = false;
+enable_display_holders = true;
 
 //
 // Constants
@@ -272,8 +272,6 @@ module lower_left_mobo_mount() {
 }
 
 module display_panel() {
-    
-    
     translate([-display_width / 2, 0, 0])
     cube([display_width, display_thickness, display_height]);
 }
@@ -282,6 +280,7 @@ module display_holder() {
     bezel_corner_curve_radius = 19;
     post_radius = 9;
     post_screw_radius = 4;
+    
     
     
 }
@@ -327,10 +326,10 @@ difference() {
     }
     
     translate_display_assembly()
-    display_panel();
+    #display_panel();
     
     translate([motherboard_offset_x, 0, 0])
-    motherboard();
+    #motherboard();
     
     translate([0, 0, mobo_baseplate_height_offset])
     #baseplate();
