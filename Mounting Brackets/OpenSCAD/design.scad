@@ -11,6 +11,8 @@ enable_top_mount = false;
 enable_bottem_left_mount = true;
 enable_bottom_right_mount = false;
 
+enable_display_holders = false;
+
 //
 // Constants
 //
@@ -28,26 +30,16 @@ SEM = 0.0000001;
 // Variables
 //
 
+motherboard_width=241;
+motherboard_height=241;
+motherboard_keepout_depth = 120;
+motherboard_baseplate_thickness = 2.5; // motherboard thickness
 
-plate_thickness = 2.5; // motherboard thickness
+mobo_baseplate_height_offset = -15;
 
-top_spacing = 5;
-post_diameter = 8 + 1; // 1mm tolerence
-post_channel_length = 2 + 1; // 1mm telerence
-post_channel_width = 1 + 0.5; // 0.5mm of tolerance
-screw_diameter = 5;
-post_height_offset = 5;
-
-box_width = 145;
-box_length = 40;
-box_height = 30;
-
-post_height = box_height - post_height_offset + 2 * SEM;
-post_channel_length_total = post_diameter / 2 + post_channel_length + 2 * SEM;
-post_channel_upper_length_total = post_diameter / 2 + top_spacing + 2 * SEM;
-
-post_channel_upper_cutout_length_total = post_diameter / 2 + 1.5 + 2 * SEM;
-post_channel_upper_cutout_height = 4 + 2 * SEM;
+display_width=318;
+display_height=243;
+display_thickness = 7; 
 
 //
 // Modules
@@ -79,20 +71,16 @@ module cube_round(w, l, h, r) {
 // Parts
 //
 
-module motherboard_screwhole() {
-    rotate([90, 0, 0])
-    translate([0, 0, -10])
-    union() {
-        hole(2, 20);
-        translate([0, 0, 2])
-        hole(4, 20);
-    }
-}
-
 module motherboard() {
-    motherboard_width=241;
-    motherboard_height=241;
-    motherboard_keepout_depth = 120;
+    module motherboard_screwhole() {
+        rotate([90, 0, 0])
+        translate([0, 0, -10])
+        union() {
+            hole(2, 20);
+            translate([0, 0, 2])
+            hole(4, 20);
+        }
+    }
     
     translate([-motherboard_width / 2, 0, 0])
     union() {
@@ -101,20 +89,20 @@ module motherboard() {
             lip_thickness = 4;
             
             // Motherboard baseplate
-            cube([motherboard_width, plate_thickness, motherboard_height]);
+            cube([motherboard_width, motherboard_baseplate_thickness, motherboard_height]);
             
             // Underneath of motherboard
-            translate([2, plate_thickness - SEM, 2])
+            translate([2, motherboard_baseplate_thickness - SEM, 2])
             cube([motherboard_width - 4, lip_thickness + 2 * SEM, motherboard_height - 4]);
             
             // Keep Out Zone for motherboard
-            keep_out_depth = motherboard_keepout_depth - plate_thickness - lip_thickness;
+            keep_out_depth = motherboard_keepout_depth - motherboard_baseplate_thickness - lip_thickness;
             
-            translate([0, plate_thickness + lip_thickness - SEM, -3])
+            translate([0, motherboard_baseplate_thickness + lip_thickness - SEM, -3])
             cube([motherboard_width, keep_out_depth + 2 * SEM, motherboard_height + 5]);
             
             // GPU/PCIe card Keep Out
-            translate([-50, plate_thickness + lip_thickness, -3])
+            translate([-50, motherboard_baseplate_thickness + lip_thickness, -3])
             cube([50, keep_out_depth, 95]);
         }
         
@@ -150,36 +138,52 @@ module motherboard() {
     }
 }
 
-module post_complete() {
-    union() {
-                // Screw hole
-                translate([0, 0, post_height_offset / 2])
-                hole(h = post_height_offset, r = screw_diameter / 2);
-                
-                // Post hole
-                translate([0, 0, box_height / 2 + post_height_offset / 2])
-                hole(h = post_height, r = post_diameter / 2);
-                
-                // Lower channel
-                translate([0, post_channel_length_total / 2, post_height / 2 + post_height_offset])
-                cube([post_channel_width, post_channel_length_total, post_height], center = true);
-                
-                // Upper channel
-                difference() {
-                    translate([0, -post_channel_upper_length_total / 2, box_height / 2])
-                    cube([post_channel_width, post_channel_upper_length_total, box_height + 2 * SEM], center = true);
-                    translate([0, -post_channel_upper_cutout_length_total / 2, (post_channel_upper_cutout_height + post_height_offset) / 2])
-                    cube([post_channel_width, post_channel_upper_cutout_length_total, post_channel_upper_cutout_height + post_height_offset], center = true);
-                }
-            }
-}
-
 module upper_mobo_mount() {
-    
-    // Distance between two main display posts
-    width_spacing = 41.5;
-    
+    box_width = 145;
+    box_length = 40;
+    box_height = 30;
+
+    top_spacing = 5;
+    width_spacing = 41.5; // Distance between two main display posts
+
+    post_diameter = 8 + 1; // 1mm tolerence
+    post_channel_length = 2 + 1; // 1mm telerence
+    post_channel_width = 1 + 0.5; // 0.5mm of tolerance
+    screw_diameter = 5;
+    post_height_offset = 5;
+
+    post_height = box_height - post_height_offset + 2 * SEM;
+    post_channel_length_total = post_diameter / 2 + post_channel_length + 2 * SEM;
+    post_channel_upper_length_total = post_diameter / 2 + top_spacing + 2 * SEM;
+
+    post_channel_upper_cutout_length_total = post_diameter / 2 + 1.5 + 2 * SEM;
+    post_channel_upper_cutout_height = 4 + 2 * SEM;
+
     top_offset = - post_diameter / 2 - top_spacing;
+    
+    module top_post_complete() {
+        union() {
+            // Screw hole
+            translate([0, 0, post_height_offset / 2])
+            hole(h = post_height_offset, r = screw_diameter / 2);
+            
+            // Post hole
+            translate([0, 0, box_height / 2 + post_height_offset / 2])
+            hole(h = post_height, r = post_diameter / 2);
+            
+            // Lower channel
+            translate([0, post_channel_length_total / 2, post_height / 2 + post_height_offset])
+            cube([post_channel_width, post_channel_length_total, post_height], center = true);
+            
+            // Upper channel
+            difference() {
+                translate([0, -post_channel_upper_length_total / 2, box_height / 2])
+                cube([post_channel_width, post_channel_upper_length_total, box_height + 2 * SEM], center = true);
+                translate([0, -post_channel_upper_cutout_length_total / 2, (post_channel_upper_cutout_height + post_height_offset) / 2])
+                cube([post_channel_width, post_channel_upper_cutout_length_total, post_channel_upper_cutout_height + post_height_offset], center = true);
+            }
+        }
+    }
     
     difference() {
         translate([-box_width / 2 - 34, top_offset, 0])
@@ -199,10 +203,10 @@ module upper_mobo_mount() {
             // Posts cutout
             union() {
                 translate([width_spacing / 2, 0, 0])
-                post_complete();
+                top_post_complete();
                 
                 translate([-width_spacing / 2, 0, 0])
-                post_complete();
+                top_post_complete();
             }
             
             shim_depth_offset = box_height - post_height_offset + 0.5;
@@ -220,83 +224,114 @@ module upper_mobo_mount() {
     }
 }
 
-module baseplate_screwhole() {
-    translate([0, 0, 0])
-    union() {
-        translate([0, 0, 12])
-        hole(4, 20);
-        
-        hole(2, 40);
-        
-        translate([0, 0, -10])
-        hole(3, 20); // post diameter is 5mm, so this has 1mm tolerence in diameter
+module baseplate() {
+    module baseplate_screwhole() {
+        translate([0, 0, 0])
+        union() {
+            translate([0, 0, 12])
+            hole(4, 20);
+            
+            hole(2, 40);
+            
+            translate([0, 0, -10])
+            hole(3, 20); // post diameter is 5mm, so this has 1mm tolerence in diameter
+        }
     }
+    
+    screw_a_offset_x = 0;
+    screw_a_offset_y = motherboard_baseplate_thickness + 46; // distance from right screw to mobo front + mobo thickness
+    
+    screw_b_offset_x = 122.5;
+    screw_b_offset_y = motherboard_baseplate_thickness + 33; // distance from right screw to mobo front + mobo thickness
+    
+    baseplate_post_height = 7.5;
+    
+    translate([-screw_a_offset_x, screw_a_offset_y, baseplate_post_height])
+    baseplate_screwhole();
+    
+    translate([-screw_b_offset_x, screw_b_offset_y, baseplate_post_height])
+    baseplate_screwhole();
+    
+    baseplate_width = 330;
+    baseplate_length = 333;
+    baseplate_height = 20;
+    
+    translate([-330 / 2, -33, -baseplate_height])
+    cube([baseplate_width, baseplate_length, baseplate_height]);
 }
 
 module lower_left_mobo_mount() {
-    screw_trim = 10; // minimum space around each screw hole
+    lmount_width = 143;
+    lmount_height = -mobo_baseplate_height_offset + 20;
     
-    screw_a_x_dist = 12; // distance from right screw to mobo edge
-    screw_a_y_dist = plate_thickness + 33; // distance from right screw to mobo front + mobo thickness
-    
-    screw_b_x_dist = -111; // distance from right screw to mobo edge
-    screw_b_y_dist = plate_thickness + 46; // distance from right screw to mobo front + mobo thickness
-    
-    edge_x_lip = max(screw_a_x_dist, screw_b_x_dist) + screw_trim;
-    
-    mobo_baseplate_height_offset = 15; // distance between the bottom edge of the mobo and base plate
-    baseplate_post_height = 7.5;
-    lmount_post_height_offset = baseplate_post_height - mobo_baseplate_height_offset;
-    
-    lmount_width = abs(min(screw_a_x_dist, screw_b_x_dist)) + screw_trim + edge_x_lip;
-    lmount_height = mobo_baseplate_height_offset + 10 + screw_trim;
     lmount_thickness = 10;
+    lmount_base_depth = motherboard_baseplate_thickness + 56;
     
-    lmount_base_depth = max(screw_a_y_dist, screw_b_y_dist) + screw_trim;
+    translate([-21, -lmount_thickness, mobo_baseplate_height_offset])
+    cube_round(lmount_width, lmount_base_depth + lmount_thickness, lmount_height, 3);
+}
+
+module display_panel() {
     
-    difference() {
-        translate([0, 0, -mobo_baseplate_height_offset])
-        union() {
-            translate([-edge_x_lip, -lmount_thickness, 0])
-            cube_round(lmount_width, lmount_base_depth + lmount_thickness, lmount_height, 3);
-        }
-        
-        translate([-screw_a_x_dist, screw_a_y_dist, lmount_post_height_offset])
-        #baseplate_screwhole();
-        translate([-screw_b_x_dist, screw_b_y_dist, lmount_post_height_offset])
-        #baseplate_screwhole();
-    }
+    
+    translate([-display_width / 2, 0, 0])
+    cube([display_width, display_thickness, display_height]);
+}
+
+module display_holder() {
+    bezel_corner_curve_radius = 19;
+    post_radius = 9;
+    post_screw_radius = 4;
+    
+    
 }
 
 //
 // All parts
 //
 
+// The offset from center for the motherboard plate.
+// 10mm provides enough room for a 300mm long GPU.
+motherboard_offset_x = 10;
+
+display_offset_y = -100;
+display_offset_z = 20;
+
+// module that translates the display assembly componants into the correct position and orientation
+module translate_display_assembly()
+{
+    translate([0, display_offset_y, display_offset_z])
+    rotate([-20, 0, 0])
+    children();
+}
+
 difference() {
-    
     union() {
         if(enable_top_mount) {
             //translate([0, 6.5, 246])
-            translate([-10, 30, 249])
+            translate([0, 30, 249])
             rotate([-70, 0, 180])
             upper_mobo_mount();
         }
         
         if(enable_bottem_left_mount) {
-            translate([-241/2, 0, 0])
+            translate([-motherboard_width/2 + motherboard_offset_x, 0, 0])
             lower_left_mobo_mount();
         }
-    
+        
+        if(enable_display_holders) {
+            translate_display_assembly();
+            
+            display_holder();
+        }
     }
     
-    #motherboard();
+    translate_display_assembly()
+    display_panel();
+    
+    translate([motherboard_offset_x, 0, 0])
+    motherboard();
+    
+    translate([0, 0, mobo_baseplate_height_offset])
+    #baseplate();
 }
-
-
-
-
-
-
-
-
-
