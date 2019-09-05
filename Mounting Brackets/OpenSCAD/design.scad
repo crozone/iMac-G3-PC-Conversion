@@ -27,6 +27,22 @@ $fn=64;
 SEM = 0.0000001;
 
 //
+// Imports
+//
+
+use <shared.scad>
+
+
+//
+// Modules
+//
+
+// Hole
+module hole(r, h) {
+    cylinder(h = h + 2 * SEM, r1 = r, r2 = r, center = true);
+}
+
+//
 // Variables
 //
 
@@ -39,33 +55,7 @@ mobo_baseplate_height_offset = -15;
 
 display_width=318;
 display_height=243;
-display_thickness = 7; 
-
-//
-// Modules
-//
-
-// Triangular prism
-module prism(l, w, h){
-       polyhedron(
-               points=[[0,0,0], [l,0,0], [l,w,0], [0,w,0], [0,w,h], [l,w,h]],
-               faces=[[0,1,2,3],[5,4,3,2],[0,4,5,1],[0,3,4],[5,2,1]]
-               );
-}
-
-module hole(r, h) {
-    cylinder(h = h + 2 * SEM, r1 = r, r2 = r, center = true);
-}
-
-module cube_round(w, l, h, r) {
-    hull() 
-    {
-        translate([r, r, 0]) cylinder(h, r, r);
-        translate([w - r, r, 0]) cylinder(h, r, r);
-        translate([r, l - r, 0]) cylinder(h, r, r);
-        translate([w - r, l - r, 0]) cylinder(h, r, r);
-    }
-}
+display_thickness = 7;
 
 //
 // Parts
@@ -187,17 +177,17 @@ module upper_mobo_mount() {
     
     difference() {
         translate([-box_width / 2 - 34, top_offset, 0])
-        cube_round(box_width, box_length, box_height, 3);
+        cube_round([box_width, box_length, box_height], 3);
 
         union() {
             // Mic Cutout
             translate([0, -12, 0])
             union() {
                translate([-10 / 2, 0, - SEM])
-               cube_round(10, 10, box_height + SEM, 2);
+               cube_round([10, 10, box_height + SEM], 2);
                 
                translate([-24 / 2, 0, 12 + SEM])
-               cube_round(24, 22.5, box_height - 12, 2);
+               cube_round([24, 22.5, box_height - 12], 2);
             } 
             
             // Posts cutout
@@ -268,7 +258,7 @@ module lower_left_mobo_mount() {
     lmount_base_depth = motherboard_baseplate_thickness + 56;
     
     translate([-21, -lmount_thickness, mobo_baseplate_height_offset])
-    cube_round(lmount_width, lmount_base_depth + lmount_thickness, lmount_height, 3);
+    cube_round([lmount_width, lmount_base_depth + lmount_thickness, lmount_height], 3);
 }
 
 module display_panel() {
