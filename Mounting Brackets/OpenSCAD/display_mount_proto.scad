@@ -15,8 +15,10 @@ module display_holder_top() {
     post_surround_height = post_height + post_surround_top_height;
     
     top_ridge_angle = 90;
-    middle_ridge_angle = top_ridge_angle + 75;
+    middle_ridge_angle = top_ridge_angle + 74;
     lower_ridge_angle = middle_ridge_angle + 117;
+    
+    top_ridge_2_angle = lower_ridge_angle + 74;
     
     module translate_to_post_height() {
         translate([0, 0, -post_surround_height + post_surround_top_height])
@@ -26,7 +28,13 @@ module display_holder_top() {
     module top_ridge(height) {
         rotate([0, 0, top_ridge_angle])
         translate([15 / 2 + post_radius - 0.1, 0, - height / 2])
-        cube([15 + 0.1, 1 + 0.5, height], center = true);
+        cube([15 + 0.1, 1.5 + 0.5, height], center = true);
+    }
+    
+    module top_ridge_2(height) {
+        rotate([0, 0, top_ridge_2_angle])
+        translate([15 / 2 + post_radius - 0.1, 0, - height / 2])
+        cube([15 + 0.1, 1.5 + 0.5, height], center = true);
     }
     
     module middle_ridge(height) {
@@ -38,7 +46,7 @@ module display_holder_top() {
     module lower_ridge(height) {
         rotate([0, 0, lower_ridge_angle])
         translate([23 / 2 + post_radius - 0.1, 0, -height / 2])
-        cube([23 + 0.1, 1 + 0.5, height], center = true);
+        cube([23 + 0.1, 1.5 + 0.5, height], center = true);
     }
     
     difference() {
@@ -79,6 +87,8 @@ module display_holder_top() {
             
             // Top ridge
             top_ridge(post_height);
+            
+            //top_ridge_2(post_height);
             // Middle ridge
             middle_ridge(post_height);
             // Lower ridge
