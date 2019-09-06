@@ -15,8 +15,8 @@ module display_holder_top() {
     post_surround_height = post_height + post_surround_top_height;
     
     top_ridge_angle = 90;
-    middle_ridge_angle = top_ridge_angle + 81;
-    lower_ridge_angle = middle_ridge_angle + 116;
+    middle_ridge_angle = top_ridge_angle + 75;
+    lower_ridge_angle = middle_ridge_angle + 117;
     
     module translate_to_post_height() {
         translate([0, 0, -post_surround_height + post_surround_top_height])
