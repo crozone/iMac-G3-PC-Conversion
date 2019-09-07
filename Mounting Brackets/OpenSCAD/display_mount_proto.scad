@@ -16,7 +16,7 @@ module display_holder_top() {
     
     top_ridge_angle = 90;
     middle_ridge_angle = top_ridge_angle + 74;
-    lower_ridge_angle = middle_ridge_angle + 117;
+    lower_ridge_angle = middle_ridge_angle + 116.5;
     
     top_ridge_2_angle = lower_ridge_angle + 74;
     
@@ -27,12 +27,6 @@ module display_holder_top() {
     
     module top_ridge(height) {
         rotate([0, 0, top_ridge_angle])
-        translate([15 / 2 + post_radius - 0.1, 0, - height / 2])
-        cube([15 + 0.1, 1.5 + 0.5, height], center = true);
-    }
-    
-    module top_ridge_2(height) {
-        rotate([0, 0, top_ridge_2_angle])
         translate([15 / 2 + post_radius - 0.1, 0, - height / 2])
         cube([15 + 0.1, 1.5 + 0.5, height], center = true);
     }
@@ -88,7 +82,6 @@ module display_holder_top() {
             // Top ridge
             top_ridge(post_height);
             
-            //top_ridge_2(post_height);
             // Middle ridge
             middle_ridge(post_height);
             // Lower ridge
@@ -98,6 +91,11 @@ module display_holder_top() {
             translate([0, 0, -post_height - 1])
             linear_extrude(height = post_height + 1 - 20)
             pieSlice(post_surround_radius + 20, lower_ridge_angle - 360, middle_ridge_angle);
+            
+            #rotate([0, 0, lower_ridge_angle])
+            translate([9, -1, -post_height - 1])
+            linear_extrude(height = post_surround_height + 1)
+            pieSlice(post_surround_radius + 20, 0, 120);
         }
     }
     
