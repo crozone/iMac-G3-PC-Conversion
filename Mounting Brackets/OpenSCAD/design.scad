@@ -7,11 +7,11 @@
 // Part selection
 //
 
-enable_top_mount = true;
+enable_top_mount = false;
 enable_bottem_left_mount = true;
-enable_bottom_right_mount = true;
+enable_bottom_right_mount = false;
 
-enable_display_holders = true;
+enable_display_holders = false;
 
 //
 // Constants
@@ -308,11 +308,11 @@ difference() {
             lower_left_mobo_mount();
         }
         
-        if(enable_display_holders) {
-            translate_display_assembly();
-            
-            display_holder();
-        }
+        //if(enable_display_holders) {
+        //    translate_display_assembly();
+        //    
+        //    display_holder();
+        //}
     }
     
     translate_display_assembly()
