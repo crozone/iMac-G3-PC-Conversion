@@ -92,8 +92,15 @@ module display_holder_top() {
             linear_extrude(height = post_height + 1 - 20)
             pieSlice(post_surround_radius + 20, lower_ridge_angle - 360, middle_ridge_angle);
             
-            #rotate([0, 0, lower_ridge_angle])
+            rotate([0, 0, lower_ridge_angle])
             translate([9, -1, -post_height - 1])
+            linear_extrude(height = post_height + 1)
+            pieSlice(post_surround_radius + 20, 0, 110);
+            
+            translate([2.5, 2, 0])
+            rotate([0, 0, lower_ridge_angle])
+            translate([9, -1, -post_height - 1])
+            rotate([0, 0, -8])
             linear_extrude(height = post_surround_height + 1)
             pieSlice(post_surround_radius + 20, 0, 120);
         }
