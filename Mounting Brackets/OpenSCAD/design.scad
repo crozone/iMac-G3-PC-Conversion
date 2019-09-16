@@ -30,7 +30,7 @@ SEM = 0.0000001;
 // Imports
 //
 
-use <shared.scad>
+use <shared.scad>;
 
 
 //
@@ -270,9 +270,6 @@ module display_holder() {
     bezel_corner_curve_radius = 19;
     post_radius = 9;
     post_screw_radius = 4;
-    
-    
-    
 }
 
 //
