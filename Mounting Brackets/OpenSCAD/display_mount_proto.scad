@@ -45,17 +45,10 @@ module display_holder_top() {
     
     difference() {
         union() {
-            // Surround
-            //translate_to_post_height()
-            //cylinder(h = post_surround_height, r = post_surround_radius, center = false);
-            
             // Display mount box
             hull() {
                 translate_to_post_height()
                 cylinder(h = post_surround_height, r = post_surround_radius, center = false);
-                
-                //translate([-20, -20, -post_surround_height])
-                //cube_round([20, 20, 20], 3);
                 
                 translate([0, 0, post_surround_top_height])
                 middle_ridge(post_surround_height);
@@ -63,10 +56,9 @@ module display_holder_top() {
                 translate([0, 0, post_surround_top_height])
                 lower_ridge(post_surround_height);
                 
-                // Post (DISABLED FOR TESTING)
-                //translate([0, 0, post_surround_top_height - post_surround_height])
-                //translate([-22, -20, 0])
-                //cylinder(h = post_surround_height, r = post_radius, center = false);
+                // Extra material to hold the display
+                translate([-27, -25, -post_height])
+                cube_round([20, 20, post_surround_height], 5);
             }
         }
         
