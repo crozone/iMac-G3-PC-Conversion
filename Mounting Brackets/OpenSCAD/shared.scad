@@ -11,14 +11,19 @@ module prism(l, w, h){
 }
 
 module cube_round(v, r = 3) {
-    w = v[0];
-    l = v[1];
-    h = v[2];
-    hull() 
-    {
-        translate([r, r, 0]) cylinder(h, r, r);
-        translate([w - r, r, 0]) cylinder(h, r, r);
-        translate([r, l - r, 0]) cylinder(h, r, r);
-        translate([w - r, l - r, 0]) cylinder(h, r, r);
+    if(r <= 0) {
+        cube(v);
+    }
+    else {
+        w = v[0];
+        l = v[1];
+        h = v[2];
+        hull() 
+        {
+            translate([r, r, 0]) cylinder(h, r, r);
+            translate([w - r, r, 0]) cylinder(h, r, r);
+            translate([r, l - r, 0]) cylinder(h, r, r);
+            translate([w - r, l - r, 0]) cylinder(h, r, r);
+        }
     }
 }
