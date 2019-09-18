@@ -22,7 +22,7 @@ enable_bottom_right = false;
 //
 
 use <shared.scad>;
-use <display_mount_proto.scad>;
+use <display_mount_top.scad>;
 
 //
 // Modules
