@@ -53,7 +53,7 @@ module display_assembly() {
     mount_screw_spacing_y = 261;
     
     module display_keepout() {
-        translate([-display_keepout_width / 2, -display_keepout_height / 2, display_thickness])
+        translate([-display_keepout_width / 2, -display_keepout_height / 2, display_thickness_bottom])
         cube_round([display_keepout_width, display_keepout_height, 50], 0);
     }
     
