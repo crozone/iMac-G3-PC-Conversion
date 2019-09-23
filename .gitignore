@@ -1,2 +1,5 @@
 # Ignore gcode files
 *.gcode
+
+# Ignore CURA saves
+*.3mf
