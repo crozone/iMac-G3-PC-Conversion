@@ -24,6 +24,10 @@ The M.NT68676.2A.11486 is readily available on eBay as a drop-in controller for 
 
 The screen is almost a perfect fit for the iMac G3 stock display bezel, except the corners are slightly cut off by the curved edges. However, it's pretty close, and at this size and resolution I have not found a better display for the project, especially since this one has a display controller cheaply available on eBay.
 
+It is held in via 4 3D printed nylon mounting brackets, which fit over the original CRT mounting holes:
+
+![Display mounted rear](https://github.com/crozone/iMac-G3-PC-Conversion/raw/master/Mounting%20Brackets/Build%20Photos/Display/Screen%20rear.jpg)
+
 ### Speakers + Microphone
 
 The original speakers can be powered by a built-in amplifier included on the M.NT68676.2A.11486 display controller, i.e they become the "HDMI Audio" device. The microphone can be wired into the rear panel mic. 
