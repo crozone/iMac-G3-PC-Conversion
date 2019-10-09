@@ -7,9 +7,10 @@
 // Part selection
 //
 
-enable_top_mount = false;
+enable_top_mount = true;
+enable_bottom_right_mount = true;
 enable_bottem_left_mount = true;
-enable_bottom_right_mount = false;
+
 
 enable_display_holders = false;
 
@@ -250,7 +251,7 @@ module baseplate() {
     cube([baseplate_width, baseplate_length, baseplate_height]);
 }
 
-module lower_left_mobo_mount() {
+module lower_right_mobo_mount() {
     lmount_width = 143;
     lmount_height = -mobo_baseplate_height_offset + 20;
     
@@ -300,16 +301,10 @@ difference() {
             upper_mobo_mount();
         }
         
-        if(enable_bottem_left_mount) {
+        if(enable_bottom_right_mount) {
             translate([-motherboard_width/2 + motherboard_offset_x, 0, 0])
-            lower_left_mobo_mount();
+            lower_right_mobo_mount();
         }
-        
-        //if(enable_display_holders) {
-        //    translate_display_assembly();
-        //    
-        //    display_holder();
-        //}
     }
     
     translate_display_assembly()
