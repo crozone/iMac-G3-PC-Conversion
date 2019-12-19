@@ -42,11 +42,14 @@ module hole(r, h) {
 
 module baseplate_screwhole() {
     union() {
-        translate([0, 0, 12])
+        // Top of screw mount
+        translate([0, 0, 20 / 2 + 3])
         hole(4, 20);
         
+        // Screw thread cutout
         hole(2, 40);
         
+        // Post
         translate([0, 0, -10])
         hole(3, 20); // post diameter is 5mm, so this has 1mm tolerence in diameter
     }
@@ -55,7 +58,7 @@ module baseplate_screwhole() {
 module larger_screwhole() {
     union() {
         // Top of screw cutout
-        translate([0, 0, 20 / 2 + 2])
+        translate([0, 0, 20 / 2 + 3.5])
         hole(5, 20);
         
         // Screw thread cutout
@@ -69,10 +72,10 @@ module larger_screwhole() {
 
 module larger_screwhole_access() {
     hull() {
-        translate([0, 0, 20 / 2 + 2])
+        translate([0, 0, 20 / 2 + 3.5])
         hole(5, 20);
         
-        translate([15, 0, 50 / 2 + 2])
+        translate([15, 0, 50 / 2 + 3.5])
         hole(5, 50);
     }
 }
