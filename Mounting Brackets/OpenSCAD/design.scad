@@ -1,4 +1,4 @@
-// iMac G3 motherboard plate top mount
+// iMac G3 motherboard mounts
 // Ryan Crosby 2019
 //
 // All units are in mm
