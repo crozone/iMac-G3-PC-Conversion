@@ -118,20 +118,21 @@ module panel() {
 module mount() {
     cube([psu_length, panel_width,15]);
     
-    cube([10, 19, 40]);
+    translate([0, -11, 0])
+    cube([20, 30, 40]);
     
     // first screw bracket
-    translate([0, screw_a_pos[1] - 5, 0])
+    translate([0, screw_a_pos[1] - 6, 0])
     difference() {
-        cube([10, -screw_a_pos[1] + 5, 12]);
+        cube([10 + 1, -screw_a_pos[1] + 5 + 1, 15]);
         cube([10, 10, 3.35]);
     }
     
     // second screw bracket
-    translate([screw_b_pos[0] - 5, screw_b_pos[1] - 5, 0])
+    translate([screw_b_pos[0] - 5, screw_b_pos[1] - 6, 0])
     difference() {
         translate([-60, 0, 0])
-        cube([10 + 60, -screw_b_pos[1] + 5, 12]);
+        cube([10 + 60 + 1, -screw_b_pos[1] + 5 + 1, 15]);
         translate([-60, 0, 0])
         cube([10 + 60, 10, 3.35]);
     }
@@ -160,7 +161,7 @@ difference() {
     
     translate([0, 6, 6])
     rotate([0, 90, 0])
-    #union() {
+    union() {
         larger_screwhole();
         larger_screwhole_access();
     }
@@ -182,5 +183,8 @@ difference() {
         rotate([0, 90, 0])
         larger_screwhole_access();
     }
+    
+    translate([screw_b_pos[0] + 5, screw_b_pos[1] - 5, 0])
+    #cylinder(d = 8, h = 15);
 }
 
