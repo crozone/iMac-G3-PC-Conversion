@@ -12,6 +12,9 @@ This concept certainly isn't new, but I'm hoping to set this project apart by re
 
 Currently the project is a messy WIP project dump of OpenSCAD files and STLs that will gradually be cleaned up as the project progresses. Unfortunately the initial commit is occurring somewhat late so a lot of early project history is gone. I'm committing this mainly as a backup of what I've done, and a way to version my changes, but hopefully it will eventually be an instructional kit that can be downloaded and followed (with included 3D printed models).
 
+### Previous projects
+
+Recently I discovered a previous casemod project ([hackaday here](https://hackaday.io/project/160719-imac-g3-casemod), [github repo here](https://github.com/qbancoffee/iMac-G3-replacement-parts). This includes many similar ideas, although the mounting locations are very different. Importantly there are a few interchangable pieces that I can use, like the side panel connector plate.
 
 
 ## Overview of replacement components
@@ -40,15 +43,19 @@ The original slot-loading DVD drive is being replaced by a Panasonic UJ-265, whi
 
 ### Motherboard
 
-The motherboard form factor is microATX, which is the largest motherboard size that comfortably fits within the case without modification. It will be mounted vertically behind the display using 3D printed nylon mounting brackets. The vertical positioning, although more difficult to mount, allows for a 30cm long PCIe card. This should allow for even a 2080 Ti to be mounted comfortably within the case.
+The motherboard form factor is microATX, which is the largest motherboard size that comfortably fits within the case without modification. It will be mounted vertically behind the display using 3D printed nylon mounting brackets. The vertical positioning, although more difficult to mount, allows for the larger motherboard form factor. Otherwise, miniITX is the largest that fits horizontally in a practical way. (first prototypes completed, however need to be changed since I relocated the GPU to behind the motherboard) 
+
+### GPU
+
+The GPU is mounted directly behind the LCD panel, in between the LCD panel and the motherboard. It is mounted to a PCIe riser bracket, which is bolted to the metal chassis baseplate. This allows for a 30cm+ GPU to be mounted across the iMac behind the screen, since it is the widest part of the body. It also leaves more space free towards the rear of the iMac, for a water cooling radiator and PSU.
 
 ### Side ports
 
-Side ports will need to be extended from the motherboard IO panel and GPU, and onto an acrylic side panel mounted in the original iMac G3 IO panel location. 
+Side ports will need to be extended from the motherboard IO panel and GPU, and onto a 3D printed side panel mounted in the original iMac G3 IO panel location (done, qbancoffee's project above).
 
 ### PSU
 
-A 750W SFX form factor PSU can comfortably be mounted to the rear of the case, using more 3D printed nylon brackets. The original power socket that fits within the moulded plastic case has been desoldered from the original display controller board and will be rewired into a new power plug, which will be used with the PSU. All metal items within the case will be grounded with grounding wire.
+A Corsair 750W SFX form factor PSU can comfortably be mounted to the rear of the case, using more 3D printed nylon brackets. The original power socket that fits within the moulded plastic case has been desoldered from the original display controller board and will be rewired into a new power plug, which will be used with the PSU. All metal items within the case will be grounded with grounding wire.
 
 ### Cooling
 
