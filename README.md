@@ -14,7 +14,7 @@ Currently the project is a messy WIP project dump of OpenSCAD files and STLs tha
 
 ### Previous projects
 
-Recently I discovered a previous casemod project ([hackaday here](https://hackaday.io/project/160719-imac-g3-casemod), [github repo here](https://github.com/qbancoffee/iMac-G3-replacement-parts). This includes many similar ideas, although the mounting locations are very different. Importantly there are a few interchangable pieces that I can use, like the side panel connector plate.
+Recently I discovered a previous casemod project \([hackaday here](https://hackaday.io/project/160719-imac-g3-casemod), [github repo here](https://github.com/Diepzeevogel/iMac-G3-replacement-parts)\). This includes many similar ideas, although the mounting locations are very different. Importantly there are a few interchangable pieces that I can use, like the side panel connector plate.
 
 
 ## Overview of replacement components
@@ -51,7 +51,7 @@ The GPU is mounted directly behind the LCD panel, in between the LCD panel and t
 
 ### Side ports
 
-Side ports will need to be extended from the motherboard IO panel and GPU, and onto a 3D printed side panel mounted in the original iMac G3 IO panel location (done, qbancoffee's project above).
+Side ports will need to be extended from the motherboard IO panel and GPU, and onto a 3D printed side panel mounted in the original iMac G3 IO panel location (done, Diepzeevogel's project above).
 
 ### PSU
 
