@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="300mm"
+   height="300mm"
+   viewBox="0 0 300 300"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="overall_rad_mount.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1237">Overall radiator mount laser cut</title>
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="2.5763596"
+     inkscape:cx="124.98255"
+     inkscape:cy="107.90419"
+     inkscape:window-width="1620"
+     inkscape:window-height="1018"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:snap-object-midpoints="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid824"
+       units="mm"
+       spacingx="0.99999999"
+       spacingy="0.99999999"
+       empspacing="10" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <pattern
+       id="revside-fill"
+       x="1"
+       y="1"
+       width="2.400"
+       height="2.400"
+       patternUnits="userSpaceOnUse">
+      <line
+         x1="0"
+         y1="0"
+         x2="2.400"
+         y2="2.400"
+         style="stroke-width:0.240; stroke:black; stroke-dasharray:none;"
+         id="line4" />
+      <line
+         x1="0"
+         y1="2.400"
+         x2="2.400"
+         y2="0"
+         style="stroke-width:0.240; stroke:black; stroke-dasharray:none;"
+         id="line6" />
+    </pattern>
+    <pattern
+       id="revside-fill-silver"
+       x="1"
+       y="1"
+       width="2.400"
+       height="2.400"
+       patternUnits="userSpaceOnUse">
+      <line
+         x1="0"
+         y1="0"
+         x2="2.400"
+         y2="2.400"
+         style="stroke-width:0.240; stroke:#e0e0e0; stroke-dasharray:none;"
+         id="line9" />
+      <line
+         x1="0"
+         y1="2.400"
+         x2="2.400"
+         y2="0"
+         style="stroke-width:0.240; stroke:#e0e0e0; stroke-dasharray:none;"
+         id="line11" />
+    </pattern>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect1124"
+       style="fill:#0000ff;fill-opacity:1;stroke-width:0.0107238"
+       inkscape:label="radiator_plate_mount"
+       d="M -2.4000039e-6,89.999999 V 290.0002 H 239.99982 V 89.999999 Z M 33.499768,95.800165 a 1.6999999,1.7000005 0 1 1 0,3.39979 1.6999999,1.7000005 0 1 1 0,-3.39979 z m 185.000072,0 a 1.6999999,1.7000005 0 1 1 0,3.39979 1.6999999,1.7000005 0 1 1 0,-3.39979 z M 48.793922,97.499805 H 203.20568 l 17.79426,17.794265 V 264.70614 L 203.2062,282.49989 H 48.793406 l -7.793838,-7.79436 V 105.29467 Z M 14.499887,131.00008 a 10.000167,10.000171 0 0 1 0,20.00034 10.000167,10.000172 0 0 1 0,-20.00034 z m 0,98.00023 a 10,10.000003 0 1 1 0,19.99981 10,10.000003 0 1 1 0,-19.99981 z m 18.999881,51.79994 a 1.6999999,1.7000005 0 0 1 0,3.39979 1.6999999,1.7000005 0 1 1 0,-3.39979 z m 185.000072,0 a 1.6999999,1.7000005 0 0 1 0,3.39979 1.6999999,1.7000005 0 1 1 0,-3.39979 z" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke-width:0.0136931"
+       id="rect923"
+       width="270"
+       height="75"
+       x="-2.400004e-06"
+       y="-8.0000001e-07" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke-width:0.00973329"
+       id="rect1049"
+       width="180"
+       height="30"
+       x="39.999996"
+       y="290" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke-width:0.0057735"
+       id="rect1153"
+       width="240"
+       height="10.000002"
+       x="-2.400004e-06"
+       y="80" />
+    <circle
+       style="fill:#ff0000;stroke:none;stroke-width:0.01;stroke-opacity:1"
+       id="path858"
+       cy="3.3"
+       cx="3.3"
+       r="3.3" />
+  </g>
+  <metadata
+     id="metadata1235">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Overall radiator mount laser cut</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

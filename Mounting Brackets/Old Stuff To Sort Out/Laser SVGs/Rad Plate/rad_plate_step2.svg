@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="200.000mm"
+   height="200.000mm"
+   version="1.1"
+   viewBox="0 0 200.000 200.000"
+   id="svg1036"
+   sodipodi:docname="rad_plate_step2.svg"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:fpd="http://www.schaeffer-ag.de">
+  <sodipodi:namedview
+     id="namedview1038"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.016"
+     inkscape:cx="341.53543"
+     inkscape:cy="381.88976"
+     inkscape:window-width="1620"
+     inkscape:window-height="1018"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1034" />
+  <desc
+     id="desc1004">Created with the Front Panel Designer by the export of the file 'Untitled1.fpd'.</desc>
+  <defs
+     id="defs1016">
+    <pattern
+       id="revside-fill"
+       x="1"
+       y="1"
+       width="2.000"
+       height="2.000"
+       patternUnits="userSpaceOnUse">
+      <line
+         x1="0"
+         y1="0"
+         x2="2.000"
+         y2="2.000"
+         style="stroke-width:0.200; stroke:black; stroke-dasharray:none;"
+         id="line1006" />
+      <line
+         x1="0"
+         y1="2.000"
+         x2="2.000"
+         y2="0"
+         style="stroke-width:0.200; stroke:black; stroke-dasharray:none;"
+         id="line1008" />
+    </pattern>
+    <pattern
+       id="revside-fill-silver"
+       x="1"
+       y="1"
+       width="2.000"
+       height="2.000"
+       patternUnits="userSpaceOnUse">
+      <line
+         x1="0"
+         y1="0"
+         x2="2.000"
+         y2="2.000"
+         style="stroke-width:0.200; stroke:#e0e0e0; stroke-dasharray:none;"
+         id="line1011" />
+      <line
+         x1="0"
+         y1="2.000"
+         x2="2.000"
+         y2="0"
+         style="stroke-width:0.200; stroke:#e0e0e0; stroke-dasharray:none;"
+         id="line1013" />
+    </pattern>
+  </defs>
+  <g
+     transform="matrix(1,0,0,-1,0,200)"
+     fill-rule="evenodd"
+     style="stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="g1034">
+    <path
+       d="m 198,200 a 2,2 0 0 0 2,-2 V 2 A 2,2 0 0 0 198,0 H 2 A 2,2 0 0 0 0,2 v 196 a 2,2 0 0 0 2,2 h 196"
+       fill="#eeeeee"
+       fill-opacity="1"
+       vector-effect="non-scaling-stroke"
+       stroke="#000000"
+       stroke-width="0.1mm"
+       stroke-opacity="1"
+       fpd:visible="front back"
+       id="path1018" />
+    <path
+       d="m 180.35,17.5 a 2.15,2.15 0 1 0 4.3,0 2.15,2.15 0 1 0 -4.3,0"
+       fill="#ffffff"
+       fill-opacity="1"
+       vector-effect="non-scaling-stroke"
+       stroke="#000000"
+       stroke-width="0.1mm"
+       stroke-opacity="1"
+       fpd:visible="front back"
+       fpd:print_element="0"
+       id="path1020"
+       style="fill:none;stroke:#ff0000;stroke-opacity:1" />
+    <path
+       d="m 15.35,17.5 a 2.15,2.15 0 1 0 4.3,0 2.15,2.15 0 1 0 -4.3,0"
+       fill="#ffffff"
+       fill-opacity="1"
+       vector-effect="non-scaling-stroke"
+       stroke="#000000"
+       stroke-width="0.1mm"
+       stroke-opacity="1"
+       fpd:visible="front back"
+       fpd:print_element="0"
+       id="path1022"
+       style="fill:none;stroke:#ff0000;stroke-opacity:1" />
+    <path
+       d="m 15.35,182.5 a 2.15,2.15 0 1 0 4.3,0 2.15,2.15 0 1 0 -4.3,0"
+       fill="#ffffff"
+       fill-opacity="1"
+       vector-effect="non-scaling-stroke"
+       stroke="#000000"
+       stroke-width="0.1mm"
+       stroke-opacity="1"
+       fpd:visible="front back"
+       fpd:print_element="0"
+       id="path1024"
+       style="fill:none;stroke:#ff0000;stroke-opacity:1" />
+    <path
+       d="m 180.35,182.5 a 2.15,2.15 0 1 0 4.3,0 2.15,2.15 0 1 0 -4.3,0"
+       fill="#ffffff"
+       fill-opacity="1"
+       vector-effect="non-scaling-stroke"
+       stroke="#000000"
+       stroke-width="0.1mm"
+       stroke-opacity="1"
+       fpd:visible="front back"
+       fpd:print_element="0"
+       id="path1026"
+       style="fill:none;stroke:#ff0000;stroke-opacity:1" />
+    <path
+       id="path1028"
+       d="M 175.77344,18.898438 18.898438,175.77344 v 404.35937 l 156.876952,156.875 H 580.13086 L 737.00781,580.13086 V 175.77539 L 580.13281,18.898438 Z"
+       transform="matrix(0.26458333,0,0,-0.26458333,0,200)"
+       style="fill:none;stroke:#ff0000;stroke-opacity:1" />
+    <path
+       d="m 198,200 a 2,2 0 0 0 2,-2 V 2 A 2,2 0 0 0 198,0 H 2 A 2,2 0 0 0 0,2 v 196 a 2,2 0 0 0 2,2 h 196"
+       fill="none"
+       vector-effect="non-scaling-stroke"
+       stroke="#000000"
+       stroke-width="0.1mm"
+       stroke-opacity="1"
+       fpd:visible="front back"
+       id="path1032"
+       style="stroke:#ff0000;stroke-opacity:1" />
+  </g>
+</svg>
