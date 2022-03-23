@@ -5,7 +5,7 @@ module tab_bounds(width, tab_height) {
 
 module tab_strip(width, tab_width, tab_height, inverse = false) {
     module tabs(inverse = false) {
-        for ( i = [(inverse ? tab_width : 0) : tab_width * 2 : width / 2] ) {
+        for ( i = [(inverse ? tab_width : 0) : tab_width * 2 : width / 2 + width] ) {
             translate([i, 0])
             square([tab_width, tab_height], center = true);
 
