@@ -8,9 +8,10 @@ $fn=256;
 // Render mode:
 //
 // 0: 3D visual
-// 1: 2D Box Layout
-// 2: 2D Cutter Layout
-// 3: 2D side holder test layout
+// 1: 2D stacked
+// 2: 2D Box Layout
+// 3: 2D Cutter Layout
+// 4: 2D side holder test layout
 
 RENDER_MODE = 0;
 
@@ -23,18 +24,24 @@ RENDER_MODE = 0;
 TEXT_MODE = 1;
 
 PART_ENABLE = [
-    true, true, true, true,
-    true, true, true
+    true,
+    true,
+    true,
+    true,
+
+    true,
+    true,
+    true
 ];
 
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15); // 2^-N have exact representations in floating point. 2^-15 ~= 0.0000305
 
-material_thickness = 4.8;
-tab_height = material_thickness; // Same as material thickness.
+material_thickness = 4.5;
+tab_height = material_thickness - 0.1; // Same as material thickness.
 
 psu_size = [125, 63.5, 100];
-psu_offset = [0.25, 0.25, 0];
+psu_offset = [2, 0.5, 0];
 box_size = [psu_size[0], psu_size[1], 35] + psu_offset * 2;
 
 // Height that PSU sits under clamps
@@ -78,7 +85,7 @@ module tabbed_plate(size, tabs_type, tabs_invert) {
 
         translate([full_wide ? -tab_height : 0, 0])
         translate([total_width / 2, 0])
-        translate([0, flip ? tab_height : 0])
+        translate([0, flip ? material_thickness : 0])
         rotate(flip ? 180 : 0)
         if(!enclosed) {
             tab_strip(width = tabs_width, tab_width = 10, tab_height = tab_height, inverse = inverse);
@@ -86,9 +93,9 @@ module tabbed_plate(size, tabs_type, tabs_invert) {
         else {
             difference() {
                 translate([-total_width / 2, -tab_height])
-                square([total_width, tab_height * 2]);
+                square([total_width, material_thickness + tab_height]);
 
-                tab_strip(width = tabs_width, tab_width = 10, tab_height = tab_height, inverse = !inverse);
+                tab_strip(width = tabs_width, tab_width = 10, tab_height = material_thickness, inverse = !inverse);
             }
         }
     }
@@ -104,9 +111,9 @@ module tabbed_plate(size, tabs_type, tabs_invert) {
     }
 
     module vertical_tabs(inverse, enclosed, full_wide, flip) {
-        total_width = size[1] + (full_wide ? tab_height * 2 : 0);
+        total_width = size[1] + (full_wide ? material_thickness * 2 : 0);
 
-        translate([0, full_wide ? -tab_height : 0])
+        translate([0, full_wide ? -material_thickness : 0])
         translate([0, total_width / 2])
         rotate(flip ? 90 : -90)
         if(!enclosed) {
@@ -115,7 +122,7 @@ module tabbed_plate(size, tabs_type, tabs_invert) {
         else {
             difference() {
                 translate([-total_width / 2, 0])
-                square([total_width, tab_height * 2]);
+                square([total_width, material_thickness + tab_height]);
 
                 tab_strip(width = total_width, tab_width = 10, tab_height = tab_height, inverse = !inverse);
             }
@@ -158,9 +165,9 @@ module tabbed_plate(size, tabs_type, tabs_invert) {
 
 module psu_mount_A_2d() {
     plate_size = [box_size[0], box_size[1]];
-    inner_cutout_size = plate_size - [20, 20];
-    inner_cutout_offset = [10, 10];
-    inner_cutout_corner_radius = [4, 4];
+    inner_cutout_size = [125, 63.5] - [20, 15];
+    inner_cutout_offset = psu_offset + [10.0, 9.5];
+    inner_cutout_corner_radius = [2, 2];
 
     psu_screw_diameter = 4;
     psu_screw_positions = [
@@ -180,8 +187,8 @@ module psu_mount_A_2d() {
         complexRoundSquare(inner_cutout_size - [0, 6], rads1=[1,1], rads2=inner_cutout_corner_radius, rads3=inner_cutout_corner_radius, rads4=inner_cutout_corner_radius, center=false);
     
         // Additional cutout for the power switch
-        translate([0, -5])
-        complexRoundSquare([24, 15 + 5], rads1=[1,1], rads2=[1,1], rads3=[0,0], rads4=[0,0], center=false);
+        translate([inner_cutout_size[0] - 25, -5])
+        complexRoundSquare([25, 15 + 5], rads1=[1,1], rads2=[1,1], rads3=[0,0], rads4=[0,0], center=false);
     }
     
     // Part
@@ -265,8 +272,8 @@ module side_mount_A_2d() {
     if(TEXT_MODE < 2) {
         difference() {
             union() {
-                translate([-tab_height, 0])
-                square([box_size[0] + 2 * tab_height, side_mount_A_height]);
+                translate([-material_thickness, 0])
+                square([box_size[0] + 2 * material_thickness, side_mount_A_height]);
 
                 translate([box_size[0] / 2, side_mount_A_height])
                 tab_strip(width = box_size[0], tab_width = 10, tab_height = tab_height, inverse = true);
@@ -276,25 +283,25 @@ module side_mount_A_2d() {
                 // Tabs to lock into side_mount_B_2d
                 translate([0, side_mount_A_height / 2])
                 rotate(90)
-                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = tab_height, inverse = false);
+                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = material_thickness, inverse = false);
 
                 // Tabs to lock into side_mount_C_2d
-                translate([box_size[0] + tab_height, side_mount_A_height / 2])
+                translate([box_size[0] + material_thickness, side_mount_A_height / 2])
                 rotate(90)
-                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = tab_height, inverse = false);
+                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = material_thickness, inverse = false);
             }
 
             // Baseplate screw-holes
             // Note, this transform must be the exact opposite of the top-down X/Y transform of this part,
             // such that holders_screw_cutouts() aligns back to (0,0).
-            translate(-[0, -side_mount_A_height - tab_height])
+            translate(-[0, -side_mount_A_height - material_thickness])
             holders_screw_cutouts();
         }
     }
 
     // Text
     if(TEXT_MODE > 0) {
-        translate([15, 15])
+        translate([25, 15])
         module_label("Holder A");
     }
 }
@@ -319,20 +326,20 @@ module side_mount_B_2d() {
                 // Tabs to lock into side_mount_A_2d
                 translate([$eps, side_mount_A_height / 2])
                 rotate(90)
-                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = tab_height, inverse = false);
+                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = material_thickness, inverse = false);
             }
 
             // Baseplate screw-holes
             // Note, this transform must be the exact opposite of the top-down X/Y transform of this part,
             // such that holders_screw_cutouts() aligns back to (0,0).
-            translate(-[box_size[0] + material_thickness, -side_mount_A_height - tab_height])
+            translate(-[box_size[0] + material_thickness, -side_mount_A_height - material_thickness])
             holders_screw_cutouts();
         }
     }
 
         // Text
     if(TEXT_MODE > 0) {
-        translate([8, 45])
+        translate([13, 35])
         rotate(90)
         module_label("Holder B");
     }
@@ -346,25 +353,25 @@ module side_mount_C_2d() {
         difference() {
             union() {
                 plate_size = [width, box_size[1] + side_mount_A_height + material_thickness];
-                translate([-tab_height - width, 0])
+                translate([-material_thickness - width, 0])
                 //square(plate_size);
                 complexRoundSquare(plate_size, rads1=[5,5], rads2=[0,0], rads3=[0,0], rads4=[5,5], center=false);
 
                 // Tabs to lock into PSU bucket
-                translate([-$eps, box_size[1] / 2 + side_mount_A_height + material_thickness])
+                translate([-$eps - (material_thickness - tab_height), box_size[1] / 2 + side_mount_A_height + material_thickness])
                 rotate(90)
                 tab_strip(width = box_size[1], tab_width = 10, tab_height = tab_height, inverse = false);
 
                 // Tabs to lock into side_mount_A_2d
                 translate([-$eps, side_mount_A_height / 2])
                 rotate(90)
-                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = tab_height, inverse = false);
+                tab_strip(width = side_mount_A_height, tab_width = 10, tab_height = material_thickness, inverse = false);
             }
 
             // Baseplate screw-holes
             // Note, this transform must be the exact opposite of the top-down X/Y transform of this part,
             // such that holders_screw_cutouts() aligns back to (0,0).
-            translate(-[0, -side_mount_A_height - tab_height])
+            translate(-[0, -side_mount_A_height - material_thickness])
             holders_screw_cutouts();
         }
     }
@@ -390,7 +397,7 @@ module holders_screw_cutouts() {
     function baseplate_screwhole_offset(holes_offset, minor) = [holes_offset[0] * 8, holes_offset[1] * 14] + (minor ? [4, 7] : [0, 0]);
 
     // The bottom right screwhole is 15mm to the left of the box outer left edge, 3mm down from the box outer lower edge
-    origin_offset = [-tab_height - 15, -tab_height - 3];
+    origin_offset = [-material_thickness - 15, -material_thickness - 3];
     baseplate_screwhole_diameter = 5;
 
     screw_positions = [
@@ -408,11 +415,6 @@ module holders_screw_cutouts() {
 
         // Bottom side (Side Holder A)
         origin_offset + baseplate_screwhole_offset([16, -1], true),
-
-        // These are additional holes for Side Holder A, not present in the stock baseplate.
-        // IT will need to be drilled.
-        origin_offset + baseplate_screwhole_offset([10, -1], true),
-        origin_offset + baseplate_screwhole_offset([4, -1], true),
     ];
 
     for (this_pos = screw_positions) {
@@ -436,80 +438,113 @@ module module_label(sub_part_name) {
     }
 }
 
+module psu_mount_2d_stacked_layout() {
+    if(PART_ENABLE[0]) {
+        psu_mount_A_2d();
+    }
+
+    if(PART_ENABLE[1]) {
+        psu_mount_B_2d();
+    }
+
+    if(PART_ENABLE[2]) {
+        psu_mount_C_2d();
+    }
+
+    if(PART_ENABLE[3]) {
+        psu_mount_D_2d();
+    }
+
+    if(PART_ENABLE[4]) {
+        side_mount_A_2d();
+    }
+
+    if(PART_ENABLE[5]) {
+        side_mount_B_2d();
+    }
+
+    if(PART_ENABLE[6]) {
+        side_mount_C_2d();
+    }
+}
+
 module psu_mount_2d_layout() {
     if(PART_ENABLE[0]) {
         psu_mount_A_2d();
     }
 
     if(PART_ENABLE[1]) {
-        translate([0, -box_size[2] - tab_height * 4])
+        translate([0, -box_size[2] - material_thickness * 4])
         psu_mount_B_2d();
     }
 
     if(PART_ENABLE[2]) {
-        translate([box_size[0] + tab_height * 3, -box_size[2] - tab_height * 4])
+        translate([box_size[0] + material_thickness * 3, -box_size[2] - material_thickness * 4])
         psu_mount_C_2d();
     }
 
     if(PART_ENABLE[3]) {
-        translate([-box_size[1] - tab_height * 3, -box_size[2] - tab_height * 4])
+        translate([-box_size[1] - material_thickness * 3, -box_size[2] - material_thickness * 4])
         psu_mount_D_2d();
     }
 
     if(PART_ENABLE[4]) {
-        translate([0, -box_size[2] * 2 - tab_height * 6])
+        translate([0, -box_size[2] * 2 - material_thickness * 6])
         side_mount_A_2d();
     }
 
     if(PART_ENABLE[5]) {
-        translate([box_size[0] + 2 * tab_height, -box_size[2] * 2 -tab_height])
+        translate([box_size[0] + 2 * material_thickness, -box_size[2] * 2 -material_thickness])
         rotate(-90)
         side_mount_B_2d();
     }
 
     if(PART_ENABLE[6]) {
-        translate([-tab_height * 2, -box_size[1] - tab_height])
+        translate([-material_thickness * 2, -box_size[1] - material_thickness])
         rotate(90)
         side_mount_C_2d();
     }
 }
 
+// Acrylic sheets are 300mm wide.
+// Aim to fit within 300 x 135mm
 module psu_mount_2d_cutter_layout() {
     if(PART_ENABLE[0]) {
         psu_mount_A_2d();
     }
 
     if(PART_ENABLE[1]) {
-        translate([0, -box_size[2] - tab_height * 4])
+        translate([0, -box_size[2] - material_thickness * 4])
         psu_mount_B_2d();
     }
 
     if(PART_ENABLE[2]) {
-        translate([box_size[0] + 20, -box_size[2] + 25])
-        rotate(-90)
+        translate([box_size[0] + 20, -box_size[2] + 40])
+        rotate(270)
         psu_mount_C_2d();
     }
 
     if(PART_ENABLE[3]) {
-        translate([box_size[0] + tab_height * 3 + 100, -box_size[2] - 39])
+        translate([box_size[0] + material_thickness * 3 + 98, -box_size[2] - 24])
         rotate(90)
         psu_mount_D_2d();
     }
 
     if(PART_ENABLE[4]) {
-        translate([0, -box_size[2] * 2 - tab_height * 6])
+        translate([box_size[0] + 155, -box_size[2] * 2 - material_thickness * 6 + 33])
+        rotate(90)
         side_mount_A_2d();
     }
 
     if(PART_ENABLE[5]) {
-        translate([15, 40])
+        translate([15, 37])
         rotate(-90)
         side_mount_B_2d();
     }
 
     if(PART_ENABLE[6]) {
-        translate([230, 55])
-        rotate(90)
+        translate([145, 19])
+        rotate(-90)
         side_mount_C_2d();
     }
 }
@@ -520,17 +555,17 @@ module psu_mount_2d_holder_test_layout() {
     }
 
     if(PART_ENABLE[4]) {
-        translate([0, -side_mount_A_height - tab_height])
+        translate([0, -side_mount_A_height - material_thickness])
         side_mount_A_2d();
     }
 
     if(PART_ENABLE[5]) {
-        translate([box_size[0] + material_thickness, -side_mount_A_height - tab_height])
+        translate([box_size[0] + material_thickness, -side_mount_A_height - material_thickness])
         side_mount_B_2d();
     }
 
     if(PART_ENABLE[6]) {
-        translate([0, -side_mount_A_height - tab_height])
+        translate([0, -side_mount_A_height - material_thickness])
         side_mount_C_2d();
     }
 
@@ -552,7 +587,7 @@ module psu_mount_3d() {
     // Back
     if(PART_ENABLE[1]) {
         color("purple")
-        translate([0, -tab_height, box_size[2]])
+        translate([0, -material_thickness, box_size[2]])
         rotate([-90, 0, 0])
         linear_extrude(height = material_thickness) {
             psu_mount_B_2d();
@@ -562,7 +597,7 @@ module psu_mount_3d() {
     // Right
     if(PART_ENABLE[2]) {
         color("blue")
-        translate([box_size[0] + tab_height, 0, box_size[2]])
+        translate([box_size[0] + material_thickness, 0, box_size[2]])
         rotate([-90, 0, 90])
         linear_extrude(height = material_thickness) {
             psu_mount_C_2d();
@@ -572,7 +607,7 @@ module psu_mount_3d() {
     // Left
     if(PART_ENABLE[3]) {
         color("blue")
-        translate([-tab_height, box_size[1], box_size[2]])
+        translate([-material_thickness, box_size[1], box_size[2]])
         rotate([-90, 0, -90])
         linear_extrude(height = material_thickness) {
             psu_mount_D_2d();
@@ -582,7 +617,7 @@ module psu_mount_3d() {
     // Back mount
     if(PART_ENABLE[4]) {
         color("red")
-        translate([0, -side_mount_A_height - tab_height, mount_height])
+        translate([0, -side_mount_A_height - material_thickness, mount_height])
         linear_extrude(height = material_thickness) {
             side_mount_A_2d();
         }
@@ -591,7 +626,7 @@ module psu_mount_3d() {
     // SIDE B
     if(PART_ENABLE[5]) {
         color("green")
-        translate([box_size[0] + material_thickness, -side_mount_A_height - tab_height, mount_height])
+        translate([box_size[0] + material_thickness, -side_mount_A_height - material_thickness, mount_height])
         linear_extrude(height = material_thickness) {
             side_mount_B_2d();
         }
@@ -599,7 +634,7 @@ module psu_mount_3d() {
 
     if(PART_ENABLE[6]) {
         color("orange")
-        translate([0, -side_mount_A_height - tab_height, mount_height])
+        translate([0, -side_mount_A_height - material_thickness, mount_height])
         linear_extrude(height = material_thickness) {
             side_mount_C_2d();
         }
@@ -613,11 +648,14 @@ if(RENDER_MODE == 0) {
     psu_mount_3d();
 }
 else if(RENDER_MODE == 1) {
-    psu_mount_2d_layout();
+    psu_mount_2d_stacked_layout();
 }
 else if(RENDER_MODE == 2) {
-    psu_mount_2d_cutter_layout();
+    psu_mount_2d_layout();
 }
 else if(RENDER_MODE == 3) {
+    psu_mount_2d_cutter_layout();
+}
+else if(RENDER_MODE == 4) {
     psu_mount_2d_holder_test_layout();
 }
