@@ -20,8 +20,8 @@ tab_positions = [
     [20, 0],
     [35 - material_thickness, 0],
 
-    [70, 0],
-    [95 - material_thickness, 0],
+    // [70, 0],
+    // [95 - material_thickness, 0],
 
     [125, 0],
     [150 - material_thickness, 0],

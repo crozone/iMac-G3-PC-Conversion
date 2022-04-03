@@ -25,7 +25,8 @@ radiator_cutout_height = 35 + 10; // Radiator is 35mm tall. Add 15mm tolerance t
 
 rad_mount_screw_spacing = 185; // All screws that mount the radiator to the plate are in an 18.5mm x 18.5mm square
 
-rad_offset = [15 - 25, -extra_plate_height / 2 + 10]; // The offset from center that the radiator sits on the mount, relative to its mounting screws.
+//rad_offset = [15 - 25, -extra_plate_height / 2 + 10]; // The offset from center that the radiator sits on the mount, relative to its mounting screws.
+rad_offset = [-15 + 25, -extra_plate_height / 2 + 10]; // The offset from center that the radiator sits on the mount, relative to its mounting screws.
 
 // The radiator mounting plate part, without tabs.
 module rad_mount_2d_no_tabs() {
@@ -33,17 +34,36 @@ module rad_mount_2d_no_tabs() {
     module plate() {
         // Round the top left and right corners
         // complexRoundSquare(size, top left radius, top right radius, bottom right radius, bottom left radius, center)
-        complexRoundSquare(plate_size, rads1=[0,0], rads2=[0,0], rads3=plate_corner_radius, rads4=plate_corner_radius, center=true);
+        complexRoundSquare(plate_size, rads1=[0,0], rads2=[0,0], rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
     }
 
     module buttom_extension_plate() {
-        complexRoundSquare(bottom_extension_size, rads1=[0,0], rads2=[0,0], rads3=plate_corner_radius, rads4=plate_corner_radius, center=true);
+        complexRoundSquare(bottom_extension_size, rads1=[0,0], rads2=[0,0], rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
     }
 
     module buttom_extension() {
         buttom_extension_plate();
     }
 
+    difference() {
+        union() {
+            translate([-plate_width / 2, 0])
+            plate();
+
+            translate([0, plate_height])
+            translate([-bottom_extension_size[0] / 2, 0])
+            buttom_extension();
+        }
+
+        // Items cut out of the plate, including screw holes and cutouts
+        translate(rad_offset)
+        translate([0, 13])
+        radiator_mounting_cutouts();
+    }
+}
+
+// Contains screw holes, vent hole, and port holes for radiator.
+module radiator_mounting_cutouts() {
     module rad_port_hole() {
         circle(d = 20, center = true);
     }
@@ -82,28 +102,17 @@ module rad_mount_2d_no_tabs() {
     module vent_cutout() {
         complexRoundSquare([185, 180], rads1=inner_vent_cutout_radius, rads2=inner_vent_cutout_radius, rads3=inner_vent_cutout_radius, rads4=inner_vent_cutout_radius, center=true);
     }
-    
-    translate([0, plate_height / 2]) // Submodules are centered over [0,0], so adjust the entire plate module so the top edge of plate is at [0,0].
-    difference() {
 
-        union() {
-            plate();
+    translate([0, rad_mount_screw_spacing / 2])
+    union() {
+        rad_screw_holes();
 
-            translate([0, (plate_height / 2) + (bottom_extension_height / 2) ])
-            buttom_extension();
-        }
+        // Port holes are centered relative to middle of radiator, and 19mm left from left raidator screw mounts.
+        //translate([rad_mount_screw_spacing / 2 + 19, 0])
+        translate([-rad_mount_screw_spacing / 2 - 19, 0])
+        rad_port_holes();
 
-        // Items cut out of the plate, including screw holes and cutouts
-        translate(rad_offset)
-        union() {
-            rad_screw_holes();
-
-            // Port holes are centered relative to middle of radiator, and 19mm left from left raidator screw mounts.
-            translate([rad_mount_screw_spacing / 2 + 19, 0])
-            rad_port_holes();
-
-            vent_cutout();
-        }
+        vent_cutout();
     }
 }
 
@@ -112,9 +121,9 @@ module top_tabs() {
     tab_strip(width = 240, tab_width = 10, tab_height = tab_height);
 }
 
-module bottom_tabs() {
-    translate([0, plate_height + bottom_extension_height])
-    tab_strip(width = 180, tab_width = 10, tab_height = tab_height);
+module bottom_slot_cutouts() {
+    // TODO
+    echo("TODO: bottom_slot_cutouts()");
 }
 
 module reservoir_cutout() {
@@ -132,9 +141,6 @@ module rad_mount_2d() {
                 // Tabbed interface to top plate
                 top_tabs();
             }
-
-            // Tabbed interface to bottom plate
-            bottom_tabs();
         }
 
         // Cutout at the bottom of the extension to fit around the reservoir
