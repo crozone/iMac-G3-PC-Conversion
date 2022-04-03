@@ -51,7 +51,7 @@ module motherboard_mount_3d() {
 }
 
 module motherboard_exclusion_zone() {
-    exclusion_height = 50;
+    exclusion_height = 45;
 
     translate([0, 0, exclusion_height / 2])
     cube([200, 200, exclusion_height], center = true);
