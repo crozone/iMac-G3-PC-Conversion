@@ -1,5 +1,6 @@
 use <../Shared/2Dshapes.scad>;
 use <../Shared/tab_strip.scad>;
+use <../Shared/baseplate_screw_holes.scad>;
 
 include  <../Shared/shared_settings.scad>;
 
@@ -41,13 +42,13 @@ material_thickness = 4.5;
 tab_height = material_thickness - 0.1; // Same as material thickness.
 
 psu_size = [125, 63.5, 100];
-psu_offset = [2, 0.5, 0];
+psu_offset = [1.5, 0.5, 0];
 box_size = [psu_size[0], psu_size[1], 35] + psu_offset * 2;
 
 // Height that PSU sits under clamps
 mount_height = 35;
 
-part_name = "iMac PSU Tub v1.0";
+part_name = "iMac PSU Tub v1.2";
 
 function isEven(x) = (x % 2) == 0;
 
@@ -293,9 +294,9 @@ module side_mount_A_2d() {
 
             // Baseplate screw-holes
             // Note, this transform must be the exact opposite of the top-down X/Y transform of this part,
-            // such that holders_screw_cutouts() aligns back to (0,0).
+            // such that planar_global_cutouts() aligns back to (0,0).
             translate(-[0, -side_mount_A_height - material_thickness])
-            holders_screw_cutouts();
+            planar_global_cutouts();
         }
     }
 
@@ -331,9 +332,9 @@ module side_mount_B_2d() {
 
             // Baseplate screw-holes
             // Note, this transform must be the exact opposite of the top-down X/Y transform of this part,
-            // such that holders_screw_cutouts() aligns back to (0,0).
+            // such that planar_global_cutouts() aligns back to (0,0).
             translate(-[box_size[0] + material_thickness, -side_mount_A_height - material_thickness])
-            holders_screw_cutouts();
+            planar_global_cutouts();
         }
     }
 
@@ -353,8 +354,8 @@ module side_mount_C_2d() {
         difference() {
             union() {
                 plate_size = [width, box_size[1] + side_mount_A_height + material_thickness];
+
                 translate([-material_thickness - width, 0])
-                //square(plate_size);
                 complexRoundSquare(plate_size, rads1=[5,5], rads2=[0,0], rads3=[0,0], rads4=[5,5], center=false);
 
                 // Tabs to lock into PSU bucket
@@ -370,35 +371,27 @@ module side_mount_C_2d() {
 
             // Baseplate screw-holes
             // Note, this transform must be the exact opposite of the top-down X/Y transform of this part,
-            // such that holders_screw_cutouts() aligns back to (0,0).
+            // such that planar_global_cutouts() aligns back to (0,0).
             translate(-[0, -side_mount_A_height - material_thickness])
-            holders_screw_cutouts();
+            planar_global_cutouts();
         }
     }
 
     // Text
     if(TEXT_MODE > 0) {
-        translate([-20, 50])
+        translate([-35, 10])
         rotate(90)
         module_label("Holder C");
     }
 }
 
-
-// These screw holes must align to the hole pattern in the iMac base plate
-// The hole pattern consists of two grids of 5mm holes, with the spacings:
-// 
-// x spacing: 14mm
-// y spacing: 8mm
+// planar_global_cutouts includes all cutouts that need to be applied to the parts horizontally, when in their final position.
+// This is used to cut out anything that needs to interface to another separate part, which includes
+// the baseplate mounting screw holes, as well as the radiator mounting tabs.
 //
-// The second grid is spaced offset from the first grid, with an offset of x: 4mm and y: 7mm.
-
-module holders_screw_cutouts() {
-    function baseplate_screwhole_offset(holes_offset, minor) = [holes_offset[0] * 8, holes_offset[1] * 14] + (minor ? [4, 7] : [0, 0]);
-
+module planar_global_cutouts() {
     // The bottom right screwhole is 15mm to the left of the box outer left edge, 3mm down from the box outer lower edge
     origin_offset = [-material_thickness - 15, -material_thickness - 3];
-    baseplate_screwhole_diameter = 5;
 
     screw_positions = [
         // Left side (Side Holder C)
@@ -415,12 +408,21 @@ module holders_screw_cutouts() {
 
         // Bottom side (Side Holder A)
         origin_offset + baseplate_screwhole_offset([16, -1], true),
+
+        // // Test holes for through port alignment
+        // origin_offset + baseplate_screwhole_offset([0, 2], false),
+        // origin_offset + baseplate_screwhole_offset([-1, 5], false),
     ];
 
+    // Screw holes for mounting to baseplate
     for (this_pos = screw_positions) {
         translate(this_pos)
-        circle(d = baseplate_screwhole_diameter, center = true);
+        baseplate_screw_hole();
     }
+
+    // Through hole port on left
+    translate([-25, 20])
+    complexRoundSquare([15, 40], rads1=[5,5], rads2=[5,5], rads3=[5,5], rads4=[5,5], center=false);
 }
 
 module module_label(sub_part_name) {
@@ -519,31 +521,31 @@ module psu_mount_2d_cutter_layout() {
     }
 
     if(PART_ENABLE[2]) {
-        translate([box_size[0] + 20, -box_size[2] + 40])
+        translate([box_size[0] + 16, -box_size[2] + 40])
         rotate(270)
         psu_mount_C_2d();
     }
 
     if(PART_ENABLE[3]) {
-        translate([box_size[0] + material_thickness * 3 + 98, -box_size[2] - 24])
+        translate([box_size[0] + material_thickness * 3 + 93, -box_size[2] - 24])
         rotate(90)
         psu_mount_D_2d();
     }
 
     if(PART_ENABLE[4]) {
-        translate([box_size[0] + 155, -box_size[2] * 2 - material_thickness * 6 + 33])
+        translate([box_size[0] + 148, -box_size[2] * 2 - material_thickness * 6 + 29])
         rotate(90)
         side_mount_A_2d();
     }
 
     if(PART_ENABLE[5]) {
-        translate([15, 37])
-        rotate(-90)
+        translate([111, 25])
+        rotate(90)
         side_mount_B_2d();
     }
 
     if(PART_ENABLE[6]) {
-        translate([145, 19])
+        translate([140, 15])
         rotate(-90)
         side_mount_C_2d();
     }
@@ -571,7 +573,7 @@ module psu_mount_2d_holder_test_layout() {
 
     // The screw cutouts are actually cut out from the side-mount parts directly, using the appropriate transform for each part.
     // This is here as a guide to verify that the transforms are correct, and that the holes align correctly.
-    %holders_screw_cutouts();
+    %planar_global_cutouts();
 }
 
 module psu_mount_3d() {
