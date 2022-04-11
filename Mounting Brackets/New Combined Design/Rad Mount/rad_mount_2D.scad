@@ -39,7 +39,7 @@ bottom_tab_size = [50, extension_height + bottom_overhang];
 plate_width = 245;
 plate_height = 195 + tab_height + plate_lower_buffer + plate_upper_buffer; // Add tab height since measurements are to the inner side of the joining piece
 plate_size = [plate_width, plate_height];
-plate_offset = [5, 0];
+plate_offset = [5 - 1, 0];
 
 inner_vent_cutout_radius = [10, 10];
 inner_vent_cutout_size = [185, 180] - [2, 2];
@@ -50,7 +50,7 @@ radiator_cutout_height = 35 + 10; // Radiator is 35mm tall. Add 15mm tolerance t
 rad_mount_screw_spacing = 185; // All screws that mount the radiator to the plate are in an 18.5mm x 18.5mm square
 
 //rad_offset = [15 - 25, -plate_lower_buffer / 2 + plate_upper_buffer]; // The offset from center that the radiator sits on the mount, relative to its mounting screws.
-rad_offset = [-15 + 25, plate_upper_buffer]; // The offset from center that the radiator sits on the mount, relative to its mounting screws.
+rad_offset = [-15 + 25 - 1, plate_upper_buffer]; // The offset from center that the radiator sits on the mount, relative to its mounting screws.
 
 // total height from the top of the bottom tab cutout, to y = 0.
 total_height = plate_height + extension_height;
