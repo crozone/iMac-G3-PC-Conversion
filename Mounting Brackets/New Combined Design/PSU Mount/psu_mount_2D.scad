@@ -16,13 +16,13 @@ $fn=256;
 
 RENDER_MODE = 0;
 
-// Text mode:
+// Engrave mode:
 //
 // 0: Model only
-// 1: Model and text
-// 2: Text only
+// 1: Model and engrave
+// 2: Engrave (Text) only
 
-TEXT_MODE = 1;
+ENGRAVE_MODE = 1;
 
 PART_ENABLE = [
     true,
@@ -193,7 +193,7 @@ module psu_mount_A_2d() {
     }
     
     // Part
-    if(TEXT_MODE < 2) {
+    if(ENGRAVE_MODE < 2) {
         difference() {
             tabbed_plate(plate_size, [1, 0, 1, 1], [0, 0, 0, 1]);
 
@@ -206,7 +206,7 @@ module psu_mount_A_2d() {
     }
 
     // Text
-    if(TEXT_MODE > 0) {
+    if(ENGRAVE_MODE > 0) {
         translate([75, 55])
         rotate(180)
         module_label("Plate A");
@@ -215,7 +215,7 @@ module psu_mount_A_2d() {
 
 module psu_mount_B_2d() {
     // Part
-    if(TEXT_MODE < 2) {
+    if(ENGRAVE_MODE < 2) {
         union() {
             plate_size = [box_size[0], box_size[2]];
             tabbed_plate(plate_size, [1, 4, 1, 4], [0, 0, 0, 0]);
@@ -223,7 +223,7 @@ module psu_mount_B_2d() {
     }
 
     // Text
-    if(TEXT_MODE > 0) {
+    if(ENGRAVE_MODE > 0) {
         translate([75, 5])
         rotate(180)
         module_label("Plate B");
@@ -232,7 +232,7 @@ module psu_mount_B_2d() {
 
 module psu_mount_C_2d() {
     // Part
-    if(TEXT_MODE < 2) {
+    if(ENGRAVE_MODE < 2) {
         union() {
             plate_size = [box_size[1], box_size[2]];
             tabbed_plate(plate_size, [1, 3, 0, 3], [1, 1, 0, 1]);
@@ -240,7 +240,7 @@ module psu_mount_C_2d() {
     }
 
     // Text
-    if(TEXT_MODE > 0) {
+    if(ENGRAVE_MODE > 0) {
         translate([40, 5])
         rotate(180)
         module_label("Plate C");
@@ -249,7 +249,7 @@ module psu_mount_C_2d() {
 
 module psu_mount_D_2d() {
     // Part
-    if(TEXT_MODE < 2) {
+    if(ENGRAVE_MODE < 2) {
         union() {
             plate_size = [box_size[1], box_size[2]];
             tabbed_plate(plate_size, [0, 3, 1, 3], [0, 1, 1, 1]);
@@ -257,7 +257,7 @@ module psu_mount_D_2d() {
     }
 
     // Text
-    if(TEXT_MODE > 0) {
+    if(ENGRAVE_MODE > 0) {
         translate([40, 5])
         rotate(180)
         module_label("Plate D");
@@ -270,7 +270,7 @@ side_mount_A_height = 25;
 
 module side_mount_A_2d() {
     // Part
-    if(TEXT_MODE < 2) {
+    if(ENGRAVE_MODE < 2) {
         difference() {
             union() {
                 translate([-material_thickness, 0])
@@ -301,7 +301,7 @@ module side_mount_A_2d() {
     }
 
     // Text
-    if(TEXT_MODE > 0) {
+    if(ENGRAVE_MODE > 0) {
         translate([25, 15])
         module_label("Holder A");
     }
@@ -312,7 +312,7 @@ module side_mount_B_2d() {
     height = box_size[1] + side_mount_A_height + material_thickness;
 
         // Part
-    if(TEXT_MODE < 2) {
+    if(ENGRAVE_MODE < 2) {
         difference() {
             union() {
                 plate_size = [width, height];
@@ -339,7 +339,7 @@ module side_mount_B_2d() {
     }
 
         // Text
-    if(TEXT_MODE > 0) {
+    if(ENGRAVE_MODE > 0) {
         translate([13, 35])
         rotate(90)
         module_label("Holder B");
@@ -350,7 +350,7 @@ module side_mount_C_2d() {
     width = 40;
 
     // Part
-    if(TEXT_MODE < 2) {
+    if(ENGRAVE_MODE < 2) {
         difference() {
             union() {
                 plate_size = [width, box_size[1] + side_mount_A_height + material_thickness];
@@ -378,7 +378,7 @@ module side_mount_C_2d() {
     }
 
     // Text
-    if(TEXT_MODE > 0) {
+    if(ENGRAVE_MODE > 0) {
         translate([-35, 10])
         rotate(90)
         module_label("Holder C");

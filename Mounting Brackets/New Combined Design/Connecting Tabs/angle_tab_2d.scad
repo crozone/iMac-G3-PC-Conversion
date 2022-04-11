@@ -22,8 +22,8 @@ module angle_tabs_cutout() {
     square([tab_height, tab_length], center = true);
 }
 
-module angle_tab_2d(angle = 90, offset_a = 10, offset_b = 10, text_mode = 0) {
-    if(text_mode < 2) {
+module angle_tab_2d(angle = 90, offset_a = 10, offset_b = 10, engrave_mode = 1) {
+    if(engrave_mode < 2) {
         // A tabs
         rotate(90)
         translate([0, -(tab_total_length / 2) - offset_a])
@@ -49,7 +49,7 @@ module angle_tab_2d(angle = 90, offset_a = 10, offset_b = 10, text_mode = 0) {
         }
     }
 
-    if(text_mode > 0) {
+    if(engrave_mode > 0) {
         text_line1 = "iMac angle tab v1.0";
         text_line2 = str(material_thickness, "mm / ", angle, chr(176), " / (", offset_a, ",", offset_b,")");
 
