@@ -7,7 +7,7 @@ include  <../Shared/shared_settings.scad>;
 $fn=256;
 
 tab_height = material_thickness; // Same as material thickness.
-plate_width = 270;
+plate_width = 295; // Would go 300mm, but the acrylic is only 300mm tall, so go just under to give the edges a smooth, cut finish.
 plate_height = 75 + tab_height; // Add tab height since measurements are to the inner side of the joining piece
 plate_size = [plate_width, plate_height];
 plate_corner_radius = [4, 4];
@@ -61,7 +61,7 @@ module top_mount_2d() {
     }
 
     translate(tab_offset)
-    tab_strip(width = 240, tab_width = 10, tab_height = tab_height);
+    tab_strip(width = 260, tab_width = 10, tab_height = tab_height);
 }
 
 module top_mount_3d() {
