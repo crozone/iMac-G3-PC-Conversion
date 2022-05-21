@@ -179,7 +179,7 @@ module psu_mount_A_2d() {
     module psu_screw_holes() {
         for (this_pos = psu_screw_positions) {
             translate(this_pos)
-            circle(d = psu_screw_diameter, center = true);
+            circle(d = psu_screw_diameter);
         }
     }
 
