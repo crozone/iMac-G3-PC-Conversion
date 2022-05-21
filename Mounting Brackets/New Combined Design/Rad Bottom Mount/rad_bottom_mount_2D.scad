@@ -155,7 +155,7 @@ module rad_bottom_mount_2d(engrave_mode = 1) {
     }
 }
 
-module rad_bottom_mount_3d(with_tabs, pivot_angle, pivot_height) {
+module rad_bottom_mount_3d(with_tabs, pivot_angle, pivot_height, engrave_mode) {
     linear_extrude(height = material_thickness) {
         rad_bottom_mount_2d();
     }

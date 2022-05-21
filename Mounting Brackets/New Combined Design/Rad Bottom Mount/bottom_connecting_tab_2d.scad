@@ -72,9 +72,9 @@ module bottom_connecting_tab_2d(pivot_angle, pivot_height, engrave_mode) {
                 square([width / 2, material_thickness + width / 2]);
 
                 // Reference guide
-                // #translate([width / 2 + 1.8, pivot_height + 1.2])
-                // rotate(90 - 5)
-                // square([width / 2, material_thickness]);
+                #translate([width / 2 + 0.7, pivot_height + 0.4])
+                rotate(90 - 23)
+                square([width / 2, material_thickness]);
 
                 // Cutout elipse
                 translate([width / 2, pivot_height])
@@ -96,7 +96,7 @@ module bottom_connecting_tab_2d(pivot_angle, pivot_height, engrave_mode) {
             translate([0 - $eps, material_thickness])
             complexRoundSquare([5, rounded_height], rads1=[0, 0], rads2=[3, 3], rads3=[2, 2], rads4=[0, 0], center=false);
             
-            translate([width / 2, pivot_height])
+            #translate([width / 2, pivot_height])
             rotate(pivot_angle)
             translate([width / 2 - 5, -$eps])
             complexRoundSquare([5, material_thickness], rads1=[0, 0], rads2=[0, 0], rads3=[1, 1], rads4=[4, 4], center=false);

@@ -1,11 +1,16 @@
 use <../Shared/2Dshapes.scad>;
 use <../Shared/tab_strip.scad>;
+use <../Shared/rounded_corner.scad>;
 use <../Connecting Tabs/angle_tab_2d.scad>
 
 include  <../Shared/shared_settings.scad>;
 include <../Rad Bottom Mount/bottom_mount_settings.scad>;
 
-$fn=256;
+// Set default viewport location
+$vpt = [ 0, 122, 0 ];
+$vpr = [ 0, 0, 0 ];
+
+$fn = $preview ? 64 : 512;
 
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
@@ -56,7 +61,7 @@ rad_offset = [-15 + 25 - 1, plate_upper_buffer]; // The offset from center that 
 total_height = plate_height + extension_height;
 echo(str("Length: ", str(total_height)));
 
-part_name = "iMac Radiator Mount // v1.3";
+part_name = "iMac Radiator Mount // v1.4";
 
 function get_rad_mount_height() = total_height;
 
@@ -72,13 +77,6 @@ module module_label() {
 
         translate([0, -4])
         text(text = text_line2, font = text_font, size = 2, halign = "center", valign = "top");
-    }
-}
-
-module rounded_corner(radius = 10) {
-    difference() {
-        square([radius, radius]);
-        circle(r = radius);
     }
 }
 
@@ -217,14 +215,14 @@ module radiator_mounting_cutouts() {
         port_cutout_diameter = port_diameter + 2;
 
         // Nominal port location
-        %circle(d = port_diameter, center = true);
+        %circle(d = port_diameter);
 
         hull() {
             translate([2, 0])
-            circle(d = port_cutout_diameter, center = true);
+            circle(d = port_cutout_diameter);
 
             translate([-1, 0])
-            circle(d = port_cutout_diameter, center = true);
+            circle(d = port_cutout_diameter);
         }
     }
 
@@ -240,7 +238,7 @@ module radiator_mounting_cutouts() {
     }
 
     module rad_screw_hole() {
-        circle(d = 3.4, center = true);
+        circle(d = 3.4);
     }
 
     // Screwholes for the screws that mount the radiator to this plate.
@@ -291,6 +289,8 @@ module top_tabs() {
 
 // The radiator mounting plate part, with tabs to interlock into the top plate and bottom plate.
 module rad_mount_2d(engrave_mode) {
+    echo(str("Rad Mount Engrave Mode: ", str(engrave_mode)));
+
     difference() {
         union() {
             difference() {

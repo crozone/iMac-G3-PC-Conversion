@@ -22,7 +22,7 @@ module top_mount_2d_no_tabs() {
     module screw_holes() {
         for (this_pos = plate_screwhole_positions) {
             translate(this_pos + plate_screwhole_offset)
-            circle(d = plate_screwhole_diameter, center = true);
+            circle(d = plate_screwhole_diameter);
         }
     }
 
