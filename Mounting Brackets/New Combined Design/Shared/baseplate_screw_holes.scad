@@ -9,5 +9,5 @@ function baseplate_screwhole_offset(holes_offset, minor) = [holes_offset[0] * 8,
 
 module baseplate_screw_hole() {
     baseplate_screwhole_diameter = 5;
-    circle(d = baseplate_screwhole_diameter, center = true);
+    circle(d = baseplate_screwhole_diameter);
 }
