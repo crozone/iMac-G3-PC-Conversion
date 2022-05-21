@@ -62,7 +62,7 @@ pivot_angle = 90 - radiator_angle;
 pivot_height = radiator_bottom_mount_height_offset;
 rad_mount_offset = zero_screw_hole_offset + baseplate_screwhole_offset([-1, 6], true);
 translate(rad_mount_offset)
-rad_bottom_mount_3d(with_tabs = true, pivot_angle = pivot_angle, pivot_height = pivot_height, engrave_mode = 0);
+rad_bottom_mount_3d(with_tabs = true, pivot_angle = pivot_angle, pivot_height = pivot_height, engrave_mode = 1);
 
 // RADIATOR MOUNT
 translate([0, rad_mount_offset[1] + 7]) // Put it in the middle of the bottom mount
@@ -70,7 +70,7 @@ translate([0, 0, pivot_height + material_thickness]) // Raise it up to pivot hei
 rotate([-pivot_angle, 0, 0]) // Rotate it to match correct pivot angle
 //rotate([-80, 0, 0]) // Rotate it to match correct pivot angle
 translate([0, -get_rad_mount_height(), 0]) // Translate so that the top of the bottom tab cutout is at Y = 0
-rad_mount_3d();
+rad_mount_3d(engrave_mode = 1);
 
 
 translate([37, 0])
