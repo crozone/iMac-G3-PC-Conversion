@@ -322,6 +322,12 @@ module display_converter_top_2d(engrave_mode) {
 
         translate(pcb_offset)
         translate(fan_offset)
+        translate([0, -21])
+        text(text = "40mm fan", font = text_font, size = 2, halign = "center", valign = "top");
+
+
+        translate(pcb_offset)
+        translate(fan_offset)
         difference() {
             complexRoundSquare([40,40], rads1=[1,1], rads2=[1,1], rads3=[1,1], rads4=[1,1], center=true);
             complexRoundSquare([39,39], rads1=[1,1], rads2=[1,1], rads3=[1,1], rads4=[1,1], center=true);
