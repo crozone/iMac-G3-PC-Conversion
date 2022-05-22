@@ -69,7 +69,7 @@ extra_horizontal_offset = 5 + 5;
 plate_mount_screwhole_offset = [pcb_size[0] + pcb_offset[0] + extra_horizontal_offset, 5];
 
 // Screw hole size for #6-32 UNC PC case screw
-plate_mount_screwhole_diameter = 3.5;
+plate_mount_screwhole_diameter = 3.6;
 plate_mount_screwhole_positions = [[0, 0], [0, 25], [0, 69], [0, 98]];
 
 // Screw hole size for M3 screw = 3.5mm
