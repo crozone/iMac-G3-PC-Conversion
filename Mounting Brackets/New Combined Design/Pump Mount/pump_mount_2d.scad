@@ -10,11 +10,46 @@ use <../Shared/baseplate_screw_holes.scad>;
 
 include  <../Shared/shared_settings.scad>;
 
-$fn=256;
+// Render mode:
+//
+// 0: 3D visual
+// 1: 2D cutter layout
+// 2: 2D Main Plate
+// 3: 2D Bottom Plate
+// 4: 2D Rear Plate
+RENDER_MODE_DEFAULT = 0;
+
+// Engrave mode:
+//
+// 0: Model only
+// 1: Model and engrave
+// 2: Engrave only
+
+ENGRAVE_MODE_DEFAULT = 1;
+
+// Overridden by export script
+//
+// 1: Cut layert
+// 2: Engrave layer
+
+EXPORT_LAYER = 0;
+
+if(EXPORT_LAYER != 0) {
+    echo(str("EXPORT_LAYER enabled, set to ", EXPORT_LAYER));
+}
+
+RENDER_MODE = EXPORT_LAYER > 0 ? 1 : RENDER_MODE_DEFAULT;
+ENGRAVE_MODE = EXPORT_LAYER == 1 ? 0 : (EXPORT_LAYER == 2 ? 2 : ENGRAVE_MODE_DEFAULT);
+
+echo(str("Render mode: ", RENDER_MODE));
+echo(str("Engrave mode: ", ENGRAVE_MODE));
+
+$fn = $preview ? 64 : 128;
 
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
 
+material_thickness = 4.5;
 tab_height = material_thickness - 0.2;
 top_mount_y = 203;
 
@@ -48,6 +83,24 @@ gpu_name = "GTX 295 stock";
 gpu_y_start = 4;
 gpu_y_length = 37;
 gpu_z_start = 35;
+
+part_name = "iMac Pump Mount";
+part_version = "v1.0";
+
+module module_label(submodule_name) {
+    text_line1 = str(part_name, " // ", part_version);
+    text_line2 = submodule_name;
+
+    echo(text_line1);
+    echo(text_line2);
+
+    union() {
+        text(text = text_line1, font = text_font, size = 2, halign = "center", valign = "top");
+
+        translate([0, -4])
+        text(text = text_line2, font = text_font, size = 2, halign = "center", valign = "top");
+    }
+}
 
 module pump_mount_holes() {
 
@@ -120,7 +173,7 @@ module cables_through_hole() {
 
 }
 
-module pump_mount_main_2d() {
+module pump_mount_main_2d(engrave_mode) {
     // The top plate bounds. Centered around [0,0].
     module plate() {
         // Round the top left and right corners
@@ -140,30 +193,45 @@ module pump_mount_main_2d() {
         rotate(90)
         tab_strip(width = ts_side_len, tab_width = 10, tab_height = tab_height + $eps, inverse = false);
     }
-    
-    difference() {
-        plate();
 
-        translate([plate_size[0] / 2, top_mount_y])
-        mount_screw_holes();
+    module part() {
+        difference() {
+            plate();
 
-        translate([plate_size[0] / 2, 175])
-        bulkhead_holes();
+            translate([plate_size[0] / 2, top_mount_y])
+            mount_screw_holes();
 
-        translate(pump_pos)
-        pump_mount_holes();
+            translate([plate_size[0] / 2, 175])
+            bulkhead_holes();
 
-        translate([2, 35])
-        cable_tie_holes();
+            translate(pump_pos)
+            pump_mount_holes();
 
-        cables_through_hole();
+            translate([2, 35])
+            cable_tie_holes();
 
-        translate([rear_plate_x_offset, 0])
-        rear_plate_tabs_receptacle();
+            cables_through_hole();
+
+            translate([rear_plate_x_offset, 0])
+            rear_plate_tabs_receptacle();
+        }
+    }
+
+    module engrave() {
+        translate([68, 25])
+        module_label("Front");
+    }
+
+    if(engrave_mode <= 1) {
+        part();
+    }
+
+    if(engrave_mode >= 1) {
+        #engrave();
     }
 }
 
-module pump_mount_bottom_2d() {
+module pump_mount_bottom_2d(engrave_mode) {
     module plate() {
         //complexRoundSquare(bottom_plate_size, rads1=plate_corner_radius, rads2=plate_corner_radius, rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
        
@@ -214,22 +282,37 @@ module pump_mount_bottom_2d() {
         }
     }
     
-    difference() {
-        translate([0, -front_depth])
-        plate();
+    module part() {
+        difference() {
+            translate([0, -front_depth])
+            plate();
 
-        translate([0, -tab_height])
-        main_plate_tabs_receptacle();
+            translate([0, -tab_height])
+            main_plate_tabs_receptacle();
 
-        translate([17.5 - 2, -15])
-        #baseplate_screw_holes();
+            translate([17.5 - 2, -15])
+            baseplate_screw_holes();
 
-        translate([rear_plate_x_offset, 0])
-        rear_plate_tabs_receptacle();
+            translate([rear_plate_x_offset, 0])
+            rear_plate_tabs_receptacle();
+        }
+    }
+
+    module engrave() {
+        translate([plate_size[0] / 2, -15])
+        module_label("Bottom");
+    }
+
+    if(engrave_mode <= 1) {
+        part();
+    }
+
+    if(engrave_mode >= 1) {
+        #engrave();
     }
 }
 
-module pump_mount_rear_2d() {
+module pump_mount_rear_2d(engrave_mode) {
     module plate() {
         union() {
             difference() {
@@ -264,41 +347,63 @@ module pump_mount_rear_2d() {
         }
     }
     
-    difference() {
+    module part() {
         plate();
+    }
+
+    module engrave() {
+        translate([25, 15])
+        module_label("Rear");
+    }
+
+    if(engrave_mode <= 1) {
+        part();
+    }
+
+    if(engrave_mode >= 1) {
+        #engrave();
     }
 }
 
-module pump_mount_2d() {
-    pump_mount_main_2d();
-
-    translate([0, -70])
-    pump_mount_bottom_2d();
-
-    translate([100, 0])
-    pump_mount_rear_2d();
-}
-
-module pump_mount_3d() {
+module pump_mount_3d(engrave_mode) {
     color("blue")
     rotate([90, 0])
     linear_extrude(height = material_thickness) {
-        pump_mount_main_2d();
+        pump_mount_main_2d(engrave_mode);
     }
 
     color("green")
     linear_extrude(height = material_thickness) {
-        pump_mount_bottom_2d();
+        pump_mount_bottom_2d(engrave_mode);
     }
 
     color("purple")
     translate([rear_plate_x_offset, 0, 0])
     rotate([90, 00, 90])
     linear_extrude(height = material_thickness) {
-        pump_mount_rear_2d();
+        pump_mount_rear_2d(engrave_mode);
     }
 }
 
-pump_mount_3d();
+if(RENDER_MODE == 0) {
+    pump_mount_3d(ENGRAVE_MODE);
+}
+else if(RENDER_MODE == 1) {
+    pump_mount_main_2d(ENGRAVE_MODE);
 
-//pump_mount_3d();
+    translate([134, 153])
+    rotate(270)
+    pump_mount_bottom_2d(ENGRAVE_MODE);
+
+    translate([97, 0])
+    pump_mount_rear_2d(ENGRAVE_MODE);
+}
+else if(RENDER_MODE == 2) {
+    pump_mount_main_2d(ENGRAVE_MODE);
+}
+else if(RENDER_MODE == 3) {
+    pump_mount_bottom_2d(ENGRAVE_MODE);
+}
+else if(RENDER_MODE == 4) {
+    pump_mount_rear_2d(ENGRAVE_MODE);
+}
