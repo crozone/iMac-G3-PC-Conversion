@@ -9,12 +9,13 @@ use <../Shared/rounded_corner.scad>;
 
 include  <../Shared/shared_settings.scad>;
 
-// Set default viewport location
-//$vpt = [ 75, 57, 0 ];
-//$vpr = [ 0, 0, 0 ];
-//$vpd = 400;
 
-$fn = $preview ? 64 : 512;
+// Set default viewport location
+$vpt = [ 75, 57, 0 ];
+$vpr = [ 0, 0, 0 ];
+$vpd = 400;
+
+$fn = $preview ? 64 : 128;
 
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
@@ -174,7 +175,7 @@ module display_converter_mount_2d(engrave_mode) {
 
     module engrave() {
         translate(pcb_offset)
-        translate([40, 40])
+        translate([65, 40])
         module_label("Mount Plate");
     }
 
