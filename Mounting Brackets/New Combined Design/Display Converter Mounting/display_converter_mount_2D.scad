@@ -271,8 +271,8 @@ module display_converter_top_2d(engrave_mode) {
             speaker_plug_size = [5, 10];
             speaker_plug_offset = [139 - 5, 17];
             
-            translate(speaker_plug_offset + [-1, -1])
-            complexRoundSquare(speaker_plug_size + [2, 2], rads1=[1,1], rads2=[1,1], rads3=[1,1], rads4=[1,1], center=false);
+            translate(speaker_plug_offset + [-2 + $eps, -1])
+            complexRoundSquare(speaker_plug_size + [2, 2], rads1=[1,1], rads2=[0,0], rads3=[0,0], rads4=[1,1], center=false);
 
             // Rounded corners for Speaker plug
             translate(speaker_plug_offset + [-1, -2] + [speaker_plug_size[0], 0])
