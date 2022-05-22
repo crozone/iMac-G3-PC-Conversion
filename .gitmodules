@@ -1,0 +1,3 @@
+[submodule "openscad-trotec-export"]
+	path = openscad-trotec-export
+	url = git@github.com:crozone/openscad-trotec-export.git
