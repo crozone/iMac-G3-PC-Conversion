@@ -7,6 +7,7 @@
 use <../Shared/2Dshapes.scad>;
 use <../Shared/tab_strip.scad>;
 use <../Shared/baseplate_screw_holes.scad>;
+use <../Shared/rounded_corner.scad>;
 
 include  <../Shared/shared_settings.scad>;
 
@@ -17,7 +18,7 @@ include  <../Shared/shared_settings.scad>;
 // 2: 2D Main Plate
 // 3: 2D Bottom Plate
 // 4: 2D Rear Plate
-RENDER_MODE_DEFAULT = 0;
+RENDER_MODE_DEFAULT = 1;
 
 // Engrave mode:
 //
@@ -54,7 +55,7 @@ tab_height = material_thickness - 0.2;
 top_mount_y = 203;
 
 // How far forwards and backwards the bottom plate extends, which informs the depth of the rear bracket as well
-rear_depth = 55; //60;
+rear_depth = 53;
 front_depth = 15 + 15;
 
 // Plate height is based directly off the top mount screw Y position.
@@ -71,6 +72,12 @@ plate_screw_hole_distance = 55;
 // Bulkheads are 24mm in diameter, with 20mm thread.
 bulkhead_diameter = 24;
 bulkhead_hole_diameter = 20.1;
+bulkhead_hole_horizontal_space = 47;
+bulkhead_hole_offset = [(plate_size[0] / 2) + 2.5, 175];
+bulkhead_hole_positions = [
+    [bulkhead_hole_horizontal_space / 2, 0] + bulkhead_hole_offset,
+    [-bulkhead_hole_horizontal_space / 2, 0] + bulkhead_hole_offset
+];
 
 // X is measured from middle of pump mount.
 // Y is measured from the bottom screw of pump mount.
@@ -79,13 +86,12 @@ pump_pos = [50, 50];
 rear_plate_x_offset = (plate_size[0] / 2) - (material_thickness / 2);
 
 // Settings for placeholder GTX 295
-gpu_name = "GTX 295 stock";
 gpu_y_start = 4;
-gpu_y_length = 37;
+gpu_y_length = 38;
 gpu_z_start = 35;
 
 part_name = "iMac Pump Mount";
-part_version = "v1.0";
+part_version = "v1.1";
 
 module module_label(submodule_name) {
     text_line1 = str(part_name, " // ", part_version);
@@ -122,22 +128,32 @@ module pump_mount_holes() {
 }
 
 module bulkhead_holes() {
-    h_space = 40;
-    screw_hole_diameter = bulkhead_hole_diameter;
-
-    hole_positions = [
-        [h_space / 2, 0],
-        [-h_space / 2, 0]
-    ];
-
-    for (this_pos = hole_positions) {
+    for (this_pos = bulkhead_hole_positions) {
         translate(this_pos)
-        circle(d = screw_hole_diameter);
+        circle(d = bulkhead_hole_diameter);
+
+        %translate(this_pos)
+        circle(d = bulkhead_diameter);
+    }
+}
+
+module bulkhead_labels() {
+    translate([0, 12])
+    translate(bulkhead_hole_offset)
+    text(text = "GPU LOOP", font = text_font, size = 3, halign = "center", valign = "top");
+
+    translate([0, bulkhead_diameter / 2 + 6]) {
+        translate(bulkhead_hole_positions[0])
+        text(text = "IN", font = text_font, size = 3, halign = "center", valign = "top");
+
+        translate(bulkhead_hole_positions[1])
+        text(text = "OUT", font = text_font, size = 3, halign = "center", valign = "top");
     }
 }
 
 module mount_screw_holes() {
     screw_hole_diameter = plate_screw_hole_diameter;
+    vertical_tolerance = 2;
 
     hole_positions = [
         [-plate_screw_hole_distance / 2, 0],
@@ -146,12 +162,18 @@ module mount_screw_holes() {
 
     for (this_pos = hole_positions) {
         translate(this_pos)
-        circle(d = screw_hole_diameter);
+        hull() {
+            translate([0, -vertical_tolerance / 2])
+            circle(d = screw_hole_diameter);
+
+            translate([0, vertical_tolerance / 2])
+            circle(d = screw_hole_diameter);
+        }
     }
 }
 
 module cable_tie_holes() {
-    h_space = 8;
+    h_space = 12;
 
     hole_positions = [
         [h_space, 0],
@@ -169,7 +191,7 @@ module cable_tie_holes() {
 
 module cables_through_hole() {
     edge_d = [3, 3];
-    complexRoundSquare([20, 20], rads1=[0, 0], rads2=[0, 0], rads3=edge_d, rads4=[0, 0], center=false);
+    complexRoundSquare([20, 25], rads1=[0, 0], rads2=[0, 0], rads3=edge_d, rads4=[0, 0], center=false);
 
 }
 
@@ -201,7 +223,6 @@ module pump_mount_main_2d(engrave_mode) {
             translate([plate_size[0] / 2, top_mount_y])
             mount_screw_holes();
 
-            translate([plate_size[0] / 2, 175])
             bulkhead_holes();
 
             translate(pump_pos)
@@ -219,7 +240,9 @@ module pump_mount_main_2d(engrave_mode) {
 
     module engrave() {
         translate([68, 25])
-        module_label("Front");
+        module_label("Front Plate");
+
+        bulkhead_labels();
     }
 
     if(engrave_mode <= 1) {
@@ -235,15 +258,29 @@ module pump_mount_bottom_2d(engrave_mode) {
     module plate() {
         //complexRoundSquare(bottom_plate_size, rads1=plate_corner_radius, rads2=plate_corner_radius, rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
        
-        extension_width = 20;
-        extension_length = 30;
+        extension_width = 30;
+        extension_length = 32;
         wide_length = rear_depth - extension_length;
     
-        complexRoundSquare([bottom_plate_size[0], front_depth + wide_length], rads1=plate_corner_radius, rads2=plate_corner_radius, rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
-        
+        complexRoundSquare([bottom_plate_size[0], front_depth + wide_length], rads1=plate_corner_radius, rads2=[15, 15], rads3=[15, 15], rads4=plate_corner_radius, center=false);
 
-        translate([rear_plate_x_offset - extension_width / 2 + material_thickness / 2, front_depth + wide_length - $eps])
+        extension_offset = [rear_plate_x_offset - extension_width / 2 + material_thickness / 2, front_depth + wide_length - $eps];
+
+        translate(extension_offset)
         complexRoundSquare([extension_width, extension_length + $eps], rads1=[0, 0], rads2=[0, 0], rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
+
+        translate(extension_offset)
+        {
+            translate([$eps, $eps])
+            translate([-10, 10])
+            rotate(270)
+            rounded_corner(10);
+
+            translate([extension_width - $eps, -$eps])
+            translate([10, 10])
+            rotate(180)
+            rounded_corner(10);
+        }
     }
 
     module main_plate_tabs_receptacle() {
@@ -271,8 +308,8 @@ module pump_mount_bottom_2d(engrave_mode) {
             // This 0,0 screw is supposed to be in line with the mobo mounting screws
             origin_offset + baseplate_screwhole_offset([0, 0], false),
             origin_offset + baseplate_screwhole_offset([0, 2], false),
-            origin_offset + baseplate_screwhole_offset([8, 0], false),
-            origin_offset + baseplate_screwhole_offset([8, 2], false),
+            origin_offset + baseplate_screwhole_offset([7, 0], false),
+            origin_offset + baseplate_screwhole_offset([7, 2], false),
         ];
 
         // Screw holes for mounting to baseplate
@@ -290,7 +327,7 @@ module pump_mount_bottom_2d(engrave_mode) {
             translate([0, -tab_height])
             main_plate_tabs_receptacle();
 
-            translate([17.5 - 2, -15])
+            translate([17.5 - 2, -17])
             baseplate_screw_holes();
 
             translate([rear_plate_x_offset, 0])
@@ -300,7 +337,7 @@ module pump_mount_bottom_2d(engrave_mode) {
 
     module engrave() {
         translate([plate_size[0] / 2, -15])
-        module_label("Bottom");
+        module_label("Bottom Plate");
     }
 
     if(engrave_mode <= 1) {
@@ -330,7 +367,7 @@ module pump_mount_rear_2d(engrave_mode) {
                 }
 
                 translate([gpu_y_start, gpu_z_start])
-                complexRoundSquare([gpu_y_length, rear_plate_size[1] - gpu_z_start], rads1=plate_corner_radius, rads2=plate_corner_radius, rads3=[0,0], rads4=[0,0], center=false);
+                square([gpu_y_length, rear_plate_size[1] - gpu_z_start], center=false);
             }
 
             //translate([0, material_thickness])
@@ -353,7 +390,7 @@ module pump_mount_rear_2d(engrave_mode) {
 
     module engrave() {
         translate([25, 15])
-        module_label("Rear");
+        module_label("Rear Plate // GPU Support");
     }
 
     if(engrave_mode <= 1) {
