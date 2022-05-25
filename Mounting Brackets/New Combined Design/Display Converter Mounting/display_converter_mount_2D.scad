@@ -11,9 +11,9 @@ include  <../Shared/shared_settings.scad>;
 
 
 // Set default viewport location
-$vpt = [ 75, 57, 0 ];
-$vpr = [ 0, 0, 0 ];
-$vpd = 400;
+// $vpt = [ 75, 57, 0 ];
+// $vpr = [ 0, 0, 0 ];
+// $vpd = 400;
 
 $fn = $preview ? 64 : 128;
 
@@ -24,6 +24,9 @@ $eps = pow(2, -15);
 //
 // 0: 3D visual
 // 1: 2D cutter layout
+// 2: 2D Mount Only
+// 3: 2D Top Only
+
 RENDER_MODE_DEFAULT = 0;
 
 // Engrave mode:
@@ -41,11 +44,13 @@ ENGRAVE_MODE_DEFAULT = 1;
 
 EXPORT_LAYER = 0;
 
+EXPORT_RENDER_MODE = 1;
+
 if(EXPORT_LAYER != 0) {
     echo(str("EXPORT_LAYER enabled, set to ", EXPORT_LAYER));
 }
 
-RENDER_MODE = EXPORT_LAYER > 0 ? 1 : RENDER_MODE_DEFAULT;
+RENDER_MODE = EXPORT_LAYER > 0 ? EXPORT_RENDER_MODE : RENDER_MODE_DEFAULT;
 ENGRAVE_MODE = EXPORT_LAYER == 1 ? 0 : (EXPORT_LAYER == 2 ? 2 : ENGRAVE_MODE_DEFAULT);
 
 echo(str("Render mode: ", RENDER_MODE));
@@ -58,7 +63,7 @@ enable_vga_audio_cutouts = false;
 
 // From M.NT68676.2A datasheet
 pcb_size = [139, 58];
-pcb_offset = [0, 15];
+pcb_offset = [0, 5];
 pcb_height = 1.2 + 11.4;
 
 pcb_corner_radius = [3, 3];
@@ -82,7 +87,7 @@ plate_pcb_screwhole_positions = [[13.3, 21],[125, 21],[14.3, 49],[119.3, 49]];
 plate_size = plate_mount_screwhole_offset + plate_mount_screwhole_positions[3] + [5, 5];
 
 part_name = "iMac Display Driver";
-part_version = "v1.1";
+part_version = "v1.2";
 
 module module_label(submodule_name) {
     text_line1 = str(part_name, " ", submodule_name, " // ", part_version);
@@ -122,10 +127,10 @@ module display_converter_mount_2d(engrave_mode) {
             translate(pcb_offset)
             complexRoundSquare(pcb_size, rads1=[0, 0], rads2=[0,0], rads3=[0,0], rads4=plate_corner_radius, center=false);
 
-            courner_diameter = 10;
+            courner_diameter = 3;
 
-            translate(pcb_offset + [pcb_size[0], 0] + [-courner_diameter, -courner_diameter])
-            rounded_corner(courner_diameter);
+            translate(pcb_offset + [pcb_size[0], 0] + [-2, -2])
+            rounded_corner(2);
 
             translate(pcb_offset + pcb_size + [-courner_diameter, courner_diameter])
             rotate(-90)
@@ -189,7 +194,7 @@ module display_converter_mount_2d(engrave_mode) {
 }
 
 module display_converter_top_2d(engrave_mode) {
-    fan_offset = [90, 25];
+    fan_offset = [90, 21];
 
     module plate() {
         difference() {
@@ -322,7 +327,7 @@ module display_converter_top_2d(engrave_mode) {
 
         translate(pcb_offset)
         translate(fan_offset)
-        translate([0, -21])
+        translate([0, 23])
         text(text = "40mm fan", font = text_font, size = 2, halign = "center", valign = "top");
 
 
@@ -347,7 +352,7 @@ module display_converter_top_2d(engrave_mode) {
 module fan_40mm_cutout() {
     // Screws are 32mm apart
     screw_hole_spacing = 32;
-    screw_hole_diameter = 4 + 0.8;
+    screw_hole_diameter = 4 + 0.9;
 
     screw_hole_positions = [
         [-screw_hole_spacing / 2, screw_hole_spacing / 2],
@@ -392,7 +397,7 @@ if(RENDER_MODE == 0) {
 else if(RENDER_MODE == 1) {
     display_converter_mount_2d(ENGRAVE_MODE);
 
-    translate([-3, 62])
+    translate([-2, 60])
     display_converter_top_2d(ENGRAVE_MODE);
 }
 else if(RENDER_MODE == 2) {
