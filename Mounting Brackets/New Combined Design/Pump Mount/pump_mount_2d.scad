@@ -18,7 +18,7 @@ include  <../Shared/shared_settings.scad>;
 // 2: 2D Main Plate
 // 3: 2D Bottom Plate
 // 4: 2D Rear Plate
-RENDER_MODE_DEFAULT = 1;
+RENDER_MODE_DEFAULT = 0;
 
 // Engrave mode:
 //
@@ -35,11 +35,13 @@ ENGRAVE_MODE_DEFAULT = 1;
 
 EXPORT_LAYER = 0;
 
+EXPORT_RENDER_MODE = 1;
+
 if(EXPORT_LAYER != 0) {
     echo(str("EXPORT_LAYER enabled, set to ", EXPORT_LAYER));
 }
 
-RENDER_MODE = EXPORT_LAYER > 0 ? 1 : RENDER_MODE_DEFAULT;
+RENDER_MODE = EXPORT_LAYER > 0 ? EXPORT_RENDER_MODE : RENDER_MODE_DEFAULT;
 ENGRAVE_MODE = EXPORT_LAYER == 1 ? 0 : (EXPORT_LAYER == 2 ? 2 : ENGRAVE_MODE_DEFAULT);
 
 echo(str("Render mode: ", RENDER_MODE));
