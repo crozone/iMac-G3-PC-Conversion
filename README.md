@@ -1,6 +1,13 @@
-# iMac G3 Gaming PC Conversion
+# iMac G3 - Gaming PC Conversion
 
 Parts and instructions to convert an iMac G3 into a powerful, modern gaming PC.
+
+* AMD Ryzen 5900X
+* 32GB 3600 RAM
+* ASUS ROG Strix X570-I
+* NVIDIA 3080 (ASUS TUF OC)
+* 750W Corsair PSU
+* Custom water loop with D5 pump and 200x200mm radiator
 
 ## About
 
@@ -8,7 +15,7 @@ This is a project to convert a year ~2000 Apple iMac G3 DV (slot load, Graphite)
 
 The donor iMac was broken and completely missing the actual compute unit, so no working iMacs were harmed in the making of this monstrosity.
 
-This concept certainly isn't new, but I'm hoping to set this project apart by reducing the amount of destructive case modifications, and packing in significantly more power, hopefully without melting everything. This will be accomplished by using 3D printed and laser cut acrylic brackets, and a healthy amount of water cooling.
+This concept certainly isn't new, but I'm hoping to set this project apart by reducing the amount of destructive case modifications, and packing in significantly more power, hopefully without melting everything.
 
 The project is still in-progress, but should eventually become an instructional kit for reproducing the mod.
 
@@ -19,12 +26,12 @@ The project is still in-progress, but should eventually become an instructional 
 * Final laser cut parts for radiator mounting
 * Additional brackets for case reinforcements
 * Fan shroud to direct air through rear vent
+* Additional fan mounts
 * Slot loading BD drive bracket
 * Case front panel wiring
 * Side panel for IO extensions
 * Final assembly
-* Water loop filling
-* First boot (hopefully before all the parts are totally obsolete!)
+* Full documentation of all chassis modifications, third party parts, part locations, and assembly instructions
 
 ### What's complete
 
@@ -33,8 +40,13 @@ The project is still in-progress, but should eventually become an instructional 
 * PSU is patched to 240V plug on case (original location)
 * PSU is wired to mobo, GPU, water pump and display
 * UV LEDs placed and wired up to 12V RGB motherboard header
+* Water loop filled and tested (small leak in QD fitting but otherwise all good)
+* First bootup successful. BIOS configured, Windows 10 installed.
+* Stress tested with UNIGINE Heaven benchmark, Prime95. Water loop appears to have plenty of thermal capacity, even at ~500W draw from CPU + GPU.
 
 ![Rear 270 deg disassembled view](./Pics/rear_270_cover_off.JPG)
+
+![BIOS screen](./Pics/bios_screen.JPG)
 
 ### Previous similar projects
 
@@ -124,4 +136,4 @@ TODO: The underside of the iMac can have smaller 60/70/80mm fans mounted to forc
 
 ### RGB Lights
 
-No RGB in this build... instead it's all Ultra-Violet 😎. The water cooling additive is Mayhems X1 concentrate UV green (or maybe red).
+~~No~~ Only a little RGB in this build... as a treat. Instead it's mostly Ultra-Violet 😎. The water cooling additive is Mayhems X1 concentrate UV green (or maybe red).
