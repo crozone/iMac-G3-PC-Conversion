@@ -22,7 +22,7 @@ $eps = pow(2, -15);
 // 0: 3D visual
 // 1: 2D cutter layout
 
-RENDER_MODE_DEFAULT = 1;
+RENDER_MODE_DEFAULT = 0;
 
 // Engrave mode:
 //
