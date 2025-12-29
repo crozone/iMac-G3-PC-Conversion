@@ -197,9 +197,20 @@ module pcie_card_reference_2d() {
 
             // PCIe bracket
             union() {
-                square([1, PCIE_BRACKET_HEIGHT]);
+                color("pink")
                 translate([-11, PCIE_BRACKET_HEIGHT])
                 square([11 + 1, 1]);
+
+                color("blue")
+                square([1, PCIE_BRACKET_HEIGHT]);
+
+                color("red")
+                translate([0, -15.6])
+                square([1, 15.6]);
+
+                color("purple")
+                translate([0, -19.7])
+                square([1, 19.7 - 15.6]);
             }
         }
     }
@@ -222,3 +233,4 @@ if(EXPORT_LAYER == 0) {
     pcie_card_reference_2d();
 }
 
+//pcie_card_reference_2d();
