@@ -226,11 +226,15 @@ if(EXPORT_LAYER == 0 || EXPORT_LAYER == 1) {
     base_plate_2d();
 }
 
-if(EXPORT_LAYER == 0 || EXPORT_LAYER == 2) {
+if(EXPORT_LAYER == 0) {
+    // Engraver reference line
+    %translate([-1, RISER_Y_POS - 5.5 - 7])
+    square([1, 30]);
+}
+if(EXPORT_LAYER == 2) {
     // Engraver reference line
     #translate([-1, RISER_Y_POS - 5.5 - 7])
     square([1, 30]);
-
 }
 
 if(EXPORT_LAYER == 0) {
