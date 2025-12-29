@@ -70,6 +70,15 @@ PCIE_BRACKET_HEIGHT = 100.36;
 // * 5.5mm between the top of the riser PCB and the riser screw hole center
 RISER_Y_POS = PCIE_BRACKET_HEIGHT + 7 + 5.5;
 
+MOUNTING_HOLES = [
+    [-4.5 - 2, -10 + 4.5 + 2],
+    [-4.5 - 2,  40 + -4.5 - 2],
+    [-180 + 4.5 + 2, 4.5 + 2],
+    [-180 + 4.5 + 2, 40 + -4.5 - 2],
+
+    [-4.5 - 2, -120 + 4.5 + 2],
+];
+
 module base_plate_2d() {
     base_plate_size = [190, 160];
 
@@ -79,35 +88,31 @@ module base_plate_2d() {
         union() {
             // Plate behind riser
             translate([20, RISER_Y_POS - 5.5 - 7])
-            translate([-180, 30]/2)
-            roundedSquare([180, 30], r = 3);
+            translate([-180, 40]/2)
+            roundedSquare([180, 40], r = 3);
 
-            if(false) { // TEST
             // plate to hold GPU
             gpu_holder_plate_size = [20, RISER_Y_POS - 5.5 - 7 + 30 + 40];
             translate([0, -40])
             translate(gpu_holder_plate_size/2)
             roundedSquare(gpu_holder_plate_size, r = 3);
-            }
         }
+
+        // Tab support slots
+        translate([0, RISER_Y_POS - 5.5 - 7 + 19.7 - 6 - 1])
+        tab_strip(width = 40, tab_width = 7, tab_height = 6, inverse = false);
+
+        // Screw support slots
+        translate([20/2, 0])
+        tab_strip(width = 20, tab_width = 7, tab_height = 6, inverse = false);
 
         // Mounting screw holes (M4)
         translate([20, RISER_Y_POS - 5.5 - 7])
-        union() {
-            translate([-4.5 - 2, 4.5 + 2])
-            circle(d = 4.5);
-
-            translate([-4.5 - 2, - 4.5 - 2])
-            translate([0, 30])
-            circle(d = 4.5);
-
-            translate([4.5 + 2, 4.5 + 2])
-            translate([-180, 0])
-            circle(d = 4.5);
-
-            translate([4.5 + 2, - 4.5 - 2])
-            translate([-180, 30])
-            circle(d = 4.5);
+        #union() {
+            for(pos = MOUNTING_HOLES) {
+                translate(pos)
+                circle(d = 4.5);
+            }
         }
 
         // Cutout for plastic support
