@@ -72,9 +72,9 @@ RISER_Y_POS = PCIE_BRACKET_HEIGHT + 7 + 5.5;
 
 MOUNTING_HOLES = [
     [-4.5 - 2, -10 + 4.5 + 2],
-    [-4.5 - 2,  40 + -4.5 - 2],
+    [-4.5 - 2,  35 + -4.5 - 2],
     [-180 + 4.5 + 2, 4.5 + 2],
-    [-180 + 4.5 + 2, 40 + -4.5 - 2],
+    [-180 + 4.5 + 2, 35 + -4.5 - 2],
 
     [-4.5 - 2, -120 + 4.5 + 2],
 ];
@@ -88,11 +88,11 @@ module base_plate_2d() {
         union() {
             // Plate behind riser
             translate([20, RISER_Y_POS - 5.5 - 7])
-            translate([-180, 40]/2)
-            roundedSquare([180, 40], r = 3);
+            translate([-180, 35]/2)
+            roundedSquare([180, 35], r = 3);
 
             // plate to hold GPU
-            gpu_holder_plate_size = [20, RISER_Y_POS - 5.5 - 7 + 30 + 40];
+            gpu_holder_plate_size = [20, RISER_Y_POS - 5.5 - 7 + 40 + 35 ];
             translate([0, -40])
             translate(gpu_holder_plate_size/2)
             roundedSquare(gpu_holder_plate_size, r = 3);
