@@ -16,7 +16,7 @@ module tab_strip(width, tab_width, tab_height, inverse = false) {
         }
     }
 
-    intersection(width, tab_height) {
+    intersection() {
         tab_bounds(width, tab_height);
 
         translate([0, tab_height / 2])
