@@ -112,18 +112,19 @@ module base_plate_2d() {
 
         // Cutout for plastic support
         // 3mm from bottom of riser PCB, 7mm from the right):
-        translate([-7, 3])
+        translate([-7, 4])
         translate([0, -12 + 7]) // Align to bottom of PCB (PCB is 12 high, 7 is height of support cutout)
         // Align plastic support with top right of PCB:
         translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS]) // Align to PCIe datum
         translate([28, 6.5])
-        translate([-98 - 1/2, -7 - 0.5])
-        square([98 + 1, 7 + 1]); // 1mm, 0.5 margin for error
+        translate([-98 - 1/2, -7 - 1])
+        square([98 + 1, 7 + 2]); // 1mm, 0.5 margin for error
 
         // Cutout for PCIe slot on rise
+        translate([2, 0]) // Also dodge the cable
         translate([-PCIE_SLOT_DATUM_OFFSET + 14.5, RISER_Y_POS]) // Align to PCIe datum
-        translate([-(89 + 2), -25])
-        square([89 + 2, 25]);
+        translate([-(89 + 2 + 2), -25])
+        square([89 + 2 + 2, 25]);
 
         // translate([20, 130])
         // translate(-base_plate_size/2)
