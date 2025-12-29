@@ -392,8 +392,8 @@ module main_plate_2d() {
         bulkhead_holes();
 
         // PCIe riser cable cutout        
-        #translate([50 + motherboard_offset[0] + 20, 0]) // TODO: Use actual PCIe slot x offset
-        roundedSquare([100, 10], r = 2);
+        #translate([50 + motherboard_offset[0] + 20, motherboard_offset[1] - 10/2]) // TODO: Use actual PCIe slot x offset
+        roundedSquare([112, 10], r = 2);
     }
 }
 
@@ -422,6 +422,13 @@ module ek_monoblock_3d() {
             cylinder(h = 20, d = 12.9); // TODO: Verify G1/4" thread minor diameter = 12.9mm
         }
     }
+}
+
+// Inno3D GeForce RTX 5090 iCHILL Frostbite
+// 204mm x 161mm x 34mm
+module gpu_3d() {
+
+
 }
 
 module compute_sled_3d() {
