@@ -118,7 +118,7 @@ module base_plate_2d() {
         translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS]) // Align to PCIe datum
         translate([28, 6.5])
         translate([-98 - 1/2, -7 - 1])
-        square([98 + 1, 7 + 2]); // 1mm, 0.5 margin for error
+        square([98 + 1, 7 + 3.5]); // 1mm, 0.5 margin for error
 
         // Cutout for PCIe slot on rise
         translate([2, 0]) // Also dodge the cable
