@@ -56,7 +56,7 @@ $fn = $preview ? 64 : 128;
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
 
-material_thickness = 6;
+MATERIAL_THICKNESS = 6;
 
 PCIE_SLOT_DATUM_OFFSET = 59.05;
 
@@ -69,6 +69,9 @@ PCIE_BRACKET_HEIGHT = 100.36;
 // * 7mm gap between bottom of PCIe PCB and the top of the riser PCB
 // * 5.5mm between the top of the riser PCB and the riser screw hole center
 RISER_Y_POS = PCIE_BRACKET_HEIGHT + 7 + 5.5;
+
+// Spacing in between PCIe card slots
+PCIE_SPACING_PER_CARD = 20;
 
 MOUNTING_HOLES = [
     [-4.5 - 2, -10 + 4.5 + 2],
@@ -138,9 +141,6 @@ module base_plate_2d() {
         // PCIe slot datum to outer face of bracket: 59.05mm delta X
         translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS])
         riser_mounting_holes();
-
-        %translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS])
-        riser_reference_2d();
     }
 
     // Aligned with X=0 as PCIe slot datum
@@ -172,74 +172,139 @@ module riser_reference_2d() {
     }
 
 module pcie_card_reference_2d() {
-    translate([0, -PCIE_BRACKET_HEIGHT]) {
+    translate([0, -PCIE_BRACKET_HEIGHT])
+    union() {
+        translate([PCIE_SLOT_DATUM_OFFSET, 0])
         union() {
-            translate([PCIE_SLOT_DATUM_OFFSET, 0])
-            union() {
-                // PCIe card slot
+            // PCIe card slot
 
-                // Power
-                translate([-11 - 1, -4])
-                square([11, 13]);
+            // Power
+            translate([-11 - 1, -4])
+            square([11, 12]);
 
-                // Data
-                translate([1, -4])
-                square([71, 13]);
+            // Data
+            translate([1, -4])
+            square([71, 12]);
 
-            }
+        }
 
-            // PCIe slot and PCB
-            union() {
-                translate([2, 0])
-                square([17 - 2, 90]);
+        // PCIe slot and PCB
+        union() {
+            translate([2, 0])
+            square([17 - 2, 90]);
 
-                translate([35, 0])
-                square([8, 8]);
+            translate([35, 0])
+            square([8, 8]);
 
-                translate([17 - 2 + 2, 8])
-                square([232 - 17 - 2, 127]); // 5090 TUF PCB measurements
-            }
-
-            // PCIe bracket
-            union() {
-                color("pink")
-                translate([-11, PCIE_BRACKET_HEIGHT])
-                square([11 + 1, 1]);
-
-                color("blue")
-                square([1, PCIE_BRACKET_HEIGHT]);
-
-                color("red")
-                translate([0, -15.6])
-                square([1, 15.6]);
-
-                color("purple")
-                translate([0, -19.7])
-                square([1, 19.7 - 15.6]);
-            }
+            translate([17 - 2 + 2, 8])
+            square([232 - 17 - 2, 127]); // 5090 TUF PCB measurements
         }
     }
 }
 
+module pcie_bracket_reference_2d() {
+    translate([0, -PCIE_BRACKET_HEIGHT])
+    union() {
+        color("pink")
+        translate([-11, PCIE_BRACKET_HEIGHT])
+        square([11 + 1, 1]);
 
-if(EXPORT_LAYER == 0 || EXPORT_LAYER == 1) {
+        color("blue")
+        square([1, PCIE_BRACKET_HEIGHT]);
+
+        color("red")
+        translate([0, -15.6])
+        square([1, 15.6]);
+
+        color("purple")
+        translate([0, -19.7])
+        square([1, 19.7 - 15.6]);
+    }
+}
+
+module base_plate_3d() {
+    linear_extrude(height = MATERIAL_THICKNESS) 
     base_plate_2d();
 }
 
-if(EXPORT_LAYER == 0) {
-    // Engraver reference line
-    %translate([-1, RISER_Y_POS - 5.5 - 7])
-    square([1, 30]);
-}
-if(EXPORT_LAYER == 2) {
-    // Engraver reference line
-    #translate([-1, RISER_Y_POS - 5.5 - 7])
-    square([1, 30]);
+module riser_reference_3d() {
+    // Riser
+        union() {
+            // PCB
+            translate([28, 6.5])
+            translate([-116, -12])
+            cube([116, 12, 1]);
+
+            // PCIe slot
+            translate([14.5, 0]) // Align to PCIe slot datum
+            translate([0, -5.5])
+            translate([-89, -10, -10/2 + 1/2])
+            cube([89, 10, 10]); // TODO confirm height
+        }
 }
 
-if(EXPORT_LAYER == 0) {
-    %rotate(180)
+module pcie_card_reference_3d() {
+    linear_extrude(height = 1) 
     pcie_card_reference_2d();
+}
+
+module pcie_bracket_reference_3d() {
+    translate([0, -PCIE_BRACKET_HEIGHT])
+    union() {
+        translate([-11, PCIE_BRACKET_HEIGHT])
+        cube([11 + 1, 1, 20]);
+
+        cube([1, PCIE_BRACKET_HEIGHT, 20]);
+
+        color("red")
+        translate([0, -15.6])
+        square([1, 15.6]);
+
+        color("purple")
+        translate([0, -19.7])
+        square([1, 19.7 - 15.6]);
+    }
+}
+
+if(RENDER_MODE == 0) {
+    base_plate_3d();
+
+    %translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS, MATERIAL_THICKNESS])
+    riser_reference_3d();
+
+    translate([0, 0, 6])
+    %rotate(180)
+    pcie_card_reference_3d();
+
+    translate([0, 0, 6])
+    %rotate(180)
+    pcie_bracket_reference_3d();
+}
+else {
+    if(EXPORT_LAYER == 0 || EXPORT_LAYER == 1) {
+        base_plate_2d();
+
+        %translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS])
+        riser_reference_2d();
+    }
+
+    if(EXPORT_LAYER == 0) {
+        // Engraver reference line
+        %translate([-1, RISER_Y_POS - 5.5 - 7])
+        square([1, 30]);
+    }
+    if(EXPORT_LAYER == 2) {
+        // Engraver reference line
+        #translate([-1, RISER_Y_POS - 5.5 - 7])
+        square([1, 30]);
+    }
+
+    if(EXPORT_LAYER == 0) {
+        %rotate(180) {
+        pcie_card_reference_2d();
+        pcie_bracket_reference_2d();
+        }
+    }
 }
 
 //pcie_card_reference_2d();
