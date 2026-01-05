@@ -56,6 +56,14 @@ $fn = $preview ? 64 : 128;
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
 
+// Metric screw hole diameters
+M2_CLEARANCE_HOLE = 2.4;
+M3_CLEARANCE_HOLE = 3.4;
+M4_CLEARANCE_HOLE = 4.5;
+M2_DRILL_HOLE = 1.6; // For tapping
+M3_DRILL_HOLE = 2.5; // For tapping
+M4_DRILL_HOLE = 3.3; // For tapping
+
 // The thickness of the acrylic sheet being cut
 MATERIAL_THICKNESS = 6;
 
@@ -92,17 +100,18 @@ SIDE_PLATE_WIDTH = 25;
 // The height of the horizontal plates. Must be large enough to provide clearance for the PCIe brackets and IO connectors.
 HORIZONTAL_PLATE_HEIGHT = (PCIE_CARDS * PCIE_SPACING_PER_CARD) - (PCIE_SPACING_PER_CARD - (1.57 + 0.35 + 12.06)) + 1;
 
-MOUNTING_HOLES = [
-    //[0, 0],
+SLOT_PLATE_Y = RISER_Y_POS - 5.5 - 7 + 19.7 - 6 - 1;
 
+MOUNTING_HOLES = [
     [28 - 116 - 6, 12] + [-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS],
     [28 - 116 - 6, -6] + [-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS],
     [28 + 6, 12] + [-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS],
     [28 + 6, -6] + [-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS],
 
-    [SIDE_PLATE_WIDTH - 10, 12 + RISER_Y_POS],
-    [SIDE_PLATE_WIDTH - 10, 90],
-    [SIDE_PLATE_WIDTH - 10, 30],
+    [SIDE_PLATE_WIDTH - 12, 15 + RISER_Y_POS],
+
+    [SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 2*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
+    [SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
 
     [12 + 13/2, -13/2],
 ];
@@ -130,7 +139,7 @@ module base_plate_2d() {
         }
 
         // PCIe bracket slot plate tab slots
-        translate([0, RISER_Y_POS - 5.5 - 7 + 19.7 - 6 - 1])
+        translate([0, SLOT_PLATE_Y])
         union() {
             translate([-2 - 6, 0])
             square([6, MATERIAL_THICKNESS]);
@@ -138,6 +147,10 @@ module base_plate_2d() {
             square([6, MATERIAL_THICKNESS]);
             translate([16, 0])
             square([6, MATERIAL_THICKNESS]);
+
+            // Fasting screw clearance hole (M2 countersunk)
+            translate([12, MATERIAL_THICKNESS / 2])
+            circle(d = M2_CLEARANCE_HOLE);
         }
 
         // PCIe bracket screw plate tab slots
@@ -146,13 +159,17 @@ module base_plate_2d() {
             square([6, MATERIAL_THICKNESS]);
             translate([16, 0])
             square([6, MATERIAL_THICKNESS]);
+
+            // Fasting screw clearance hole (M2 countersunk)
+            translate([12, MATERIAL_THICKNESS / 2])
+            circle(d = M2_CLEARANCE_HOLE);
         }
 
         // Mounting screw holes (M4)
         union() {
             for(pos = MOUNTING_HOLES) {
                 translate(pos)
-                circle(d = 4.5);
+                circle(d = M4_CLEARANCE_HOLE);
             }
         }
 
@@ -181,10 +198,10 @@ module base_plate_2d() {
     module riser_mounting_holes() {
         translate([24, 0])
         union() {
-            circle(d = 2.5); // M3 screw hole for tapping
+            circle(d = M3_DRILL_HOLE);
 
             translate([-108, 0])
-            circle(d = 2.5); // M3 screw hole for tapping
+            circle(d = M3_DRILL_HOLE);
         }
     }
 }
@@ -203,6 +220,7 @@ module screw_plate_2d() {
             square([6, TAB_LENGTH]);
             translate([16, -TAB_LENGTH])
             square([6, TAB_LENGTH]);
+
             // Top tabs
             translate([2, HORIZONTAL_PLATE_HEIGHT])
             square([6, TAB_LENGTH]);
@@ -215,7 +233,7 @@ module screw_plate_2d() {
         union() {
             for(i = [0:PCIE_CARDS-1]) {
                 translate([0, i * PCIE_SPACING_PER_CARD])
-                circle(d = 3.3); // M4 drill hole for tapping
+                circle(d = M4_DRILL_HOLE);
             }
         }
     }
@@ -269,6 +287,55 @@ module slot_plate_2d() {
     }
 }
 
+module cross_plate_2d() {
+    difference() {
+        translate([0, TAB_MARGIN])
+        square([SIDE_PLATE_WIDTH, SLOT_PLATE_Y - TAB_MARGIN + TAB_LENGTH]);
+
+        // Cutout to access screw holes, and for right angle IO cable routing
+        #hull() {
+            // Align with IO cutout
+            translate([-1, 10.16])
+            square([1, 89.9]);
+
+            translate([SIDE_PLATE_WIDTH - 17 + 1, MATERIAL_THICKNESS + 2*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3])
+            circle(r = ROUNDED_CORNER_RADIUS);
+
+            translate([SIDE_PLATE_WIDTH - 17 + 1, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3])
+            circle(r = ROUNDED_CORNER_RADIUS);
+
+
+            //[SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 2*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
+            //[SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
+        }
+
+        // Screw plate tab slots
+        union() {
+            translate([2, 0])
+            square([6, MATERIAL_THICKNESS]);
+            translate([16, 0])
+            square([6, MATERIAL_THICKNESS]);
+
+            // Fasting screw clearance hole (M2 countersunk)
+            translate([12, MATERIAL_THICKNESS / 2])
+            circle(d = M2_CLEARANCE_HOLE);
+        }
+
+        // Slot plate tab slots
+        translate([0, SLOT_PLATE_Y])
+        union() {
+            translate([2, 0])
+            square([6, MATERIAL_THICKNESS]);
+            translate([16, 0])
+            square([6, MATERIAL_THICKNESS]);
+
+            // Fasting screw clearance hole (M2 countersunk)
+            translate([12, MATERIAL_THICKNESS / 2])
+            circle(d = M2_CLEARANCE_HOLE);
+        }
+    }
+}
+
 module riser_reference_2d() {
     // Riser
     difference() {
@@ -288,10 +355,10 @@ module riser_reference_2d() {
         // M3 clearance holes
         translate([24, 0])
         union() {
-            circle(d = 3.4);
+            circle(d = M3_CLEARANCE_HOLE);
 
             translate([-108, 0])
-            circle(d = 3.4);
+            circle(d = M3_CLEARANCE_HOLE);
         }
     }
 }
@@ -362,6 +429,11 @@ module slot_plate_3d() {
     slot_plate_2d();
 }
 
+module cross_plate_3d() {
+    linear_extrude(height = MATERIAL_THICKNESS)
+    cross_plate_2d();
+}
+
 module riser_reference_3d() {
     // Riser
     difference() {
@@ -381,10 +453,10 @@ module riser_reference_3d() {
         // M3 clearance holes
         translate([24, 0, -0.1])
         union() {
-            cylinder(h = 1 + 0.2, d = 3.4); // M3 clearance hole
+            cylinder(h = 1 + 0.2, d = M3_CLEARANCE_HOLE);
 
             translate([-108, 0])
-            cylinder(h = 1 + 0.2, d = 3.4); // M3 clearance hole
+            cylinder(h = 1 + 0.2, d = M3_CLEARANCE_HOLE);
         }
     }
 }
@@ -406,10 +478,15 @@ if(RENDER_MODE == 0) {
 
     // Slot plate
     color("orange", alpha=0.5)
-    translate([0, RISER_Y_POS - 5.5 - 7 + 19.7 - 6 - 1])
+    translate([0, SLOT_PLATE_Y])
     translate([0, MATERIAL_THICKNESS, MATERIAL_THICKNESS])
     rotate(90, [1, 0, 0])
     slot_plate_3d();
+
+    // Cross plate
+    color("purple", alpha=0.5)
+    translate([0, 0, MATERIAL_THICKNESS + HORIZONTAL_PLATE_HEIGHT])
+    cross_plate_3d();
 
     %translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS, MATERIAL_THICKNESS])
     riser_reference_3d();
@@ -425,6 +502,14 @@ if(RENDER_MODE == 0) {
         for(i = [0:PCIE_CARDS-1]) {
             translate([i * -PCIE_SPACING_PER_CARD, 0, 0])
             pcie_bracket_reference_3d();
+        }
+    }
+
+    // Mounting screw screwdriver clearance
+    %union() {
+        for(pos = MOUNTING_HOLES) {
+            translate(pos)
+            cylinder(h = HORIZONTAL_PLATE_HEIGHT + 20, d = M4_CLEARANCE_HOLE);
         }
     }
 }
