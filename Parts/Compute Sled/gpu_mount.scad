@@ -19,6 +19,7 @@
 //
 use <../Shared/2Dshapes.scad>;
 use <../Shared/rounded_corner.scad>;
+use <../Shared/rounded_square.scad>;
 use <pcie_card_bracket.scad>;
 
 include <screw_hole_sizes.scad>
@@ -60,6 +61,10 @@ $eps = pow(2, -15);
 // The thickness of the acrylic sheet being cut
 MATERIAL_THICKNESS = 6;
 
+// The thickness of the acrylic sheet being cut for the plate that sits against the PCIe bracket.
+// It is desirable for it to be thinner for easier access to GPU IO ports
+SIDE_PLATE_MATERIAL_THICKNESS=3;
+
 // On rounded corners, the radius to use.
 ROUNDED_CORNER_RADIUS = 3;
 
@@ -88,10 +93,10 @@ PCIE_SPACING_PER_CARD = 20.32;
 PCIE_CARDS = 2;
 
 // Width of the vertical section that the GPU mounting plates extend from
-SIDE_PLATE_WIDTH = 25;
+SIDE_PLATE_WIDTH = 17;
 
 // The height of the horizontal plates. Must be large enough to provide clearance for the PCIe brackets and IO connectors.
-HORIZONTAL_PLATE_HEIGHT = (PCIE_CARDS * PCIE_SPACING_PER_CARD) - (PCIE_SPACING_PER_CARD - (1.57 + 0.35 + 12.06)) + 1;
+HORIZONTAL_PLATE_HEIGHT = (PCIE_CARDS * PCIE_SPACING_PER_CARD) - (PCIE_SPACING_PER_CARD - (1.57 + 0.35 + 12.06)) + 3;
 
 SLOT_PLATE_Y = RISER_Y_POS - 5.5 - 7 + 19.7 - 6 - 1;
 
@@ -103,10 +108,8 @@ MOUNTING_HOLES = [
 
     [SIDE_PLATE_WIDTH - 12, 15 + RISER_Y_POS],
 
-    [SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 2*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
-    [SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
-
-    [12 + 13/2, -13/2],
+    [MATERIAL_THICKNESS + (SIDE_PLATE_WIDTH - MATERIAL_THICKNESS)/2, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/6],
+    [MATERIAL_THICKNESS + (SIDE_PLATE_WIDTH - MATERIAL_THICKNESS)/2, MATERIAL_THICKNESS + 5*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/6],
 ];
 
 // Provides the PCIe slot datum offset for scripts consuming this as a library with use
@@ -119,48 +122,41 @@ function gpu_mount_mounting_holes() = MOUNTING_HOLES;
 // The primary plate that everything attaches to
 //
 module base_plate_2d() {
-    base_plate_size = [190, 160];
-
     difference() {
         // Base plate
         union() {
             // Plate behind riser
-            translate([20, RISER_Y_POS - 5.5 - 7])
-            translate([-180, 35]/2)
-            roundedSquare([190, 35], r = ROUNDED_CORNER_RADIUS);
+            translate([SIDE_PLATE_WIDTH, RISER_Y_POS - 5.5 - 7])
+            translate([-165 - SIDE_PLATE_WIDTH, 0])
+            rounded_square([165 + SIDE_PLATE_WIDTH, 35], r = ROUNDED_CORNER_RADIUS, corners = [undef, 0, undef, undef]);
 
             // Plate to hold GPU
             gpu_holder_plate_size = [SIDE_PLATE_WIDTH, RISER_Y_POS - 5.5 - 7 + 10];
             square(gpu_holder_plate_size);
-
-            translate([12, -13])
-            square([SIDE_PLATE_WIDTH - 12, 13]);
         }
 
         // PCIe bracket slot plate tab slots
         translate([0, SLOT_PLATE_Y])
         union() {
-            translate([-2 - 6, 0])
-            square([6, MATERIAL_THICKNESS]);
-            translate([2, 0])
-            square([6, MATERIAL_THICKNESS]);
-            translate([16, 0])
-            square([6, MATERIAL_THICKNESS]);
+            for(i = [-8, 2]) {
+                translate([i, 0])
+                square([6, MATERIAL_THICKNESS]);
+            }
 
-            // Fasting screw clearance hole (M2 countersunk)
-            translate([12, MATERIAL_THICKNESS / 2])
-            circle(d = M2_CLEARANCE_HOLE);
+            // Fastening screw clearance hole (M2 countersunk)
+            for(i = [-12.5, 12.5]) {
+                translate([i, MATERIAL_THICKNESS / 2])
+                circle(d = M2_CLEARANCE_HOLE);
+            }
         }
 
         // PCIe bracket screw plate tab slots
         union() {
             translate([2, 0])
             square([6, MATERIAL_THICKNESS]);
-            translate([16, 0])
-            square([6, MATERIAL_THICKNESS]);
 
-            // Fasting screw clearance hole (M2 countersunk)
-            translate([12, MATERIAL_THICKNESS / 2])
+            // Fastening screw clearance hole (M2 countersunk)
+            translate([12.5, MATERIAL_THICKNESS / 2])
             circle(d = M2_CLEARANCE_HOLE);
         }
 
@@ -212,19 +208,23 @@ module screw_plate_2d() {
     difference() {
         // Plate
         union() {
-            square([SIDE_PLATE_WIDTH, HORIZONTAL_PLATE_HEIGHT]);
+            rounded_square([SIDE_PLATE_WIDTH, HORIZONTAL_PLATE_HEIGHT], corners = [0, 0, ROUNDED_CORNER_RADIUS, 0]);
 
             // Bottom tabs
-            translate([2, -TAB_LENGTH])
-            square([6, TAB_LENGTH]);
-            translate([16, -TAB_LENGTH])
-            square([6, TAB_LENGTH]);
+            for(i = [0:0]) {
+                translate([i*14 + 2, -TAB_LENGTH])
+                square([6, TAB_LENGTH]);
+            }
+        }
 
-            // Top tabs
-            translate([2, HORIZONTAL_PLATE_HEIGHT])
-            square([6, TAB_LENGTH]);
-            translate([16, HORIZONTAL_PLATE_HEIGHT])
-            square([6, TAB_LENGTH]);
+        // Side plate tabs
+        for(i = [0:1]) {
+            translate([0, i*PCIE_SPACING_PER_CARD + 8])
+            square([SIDE_PLATE_MATERIAL_THICKNESS, 6]);
+
+            // // Fastening screw clearance hole (M2 countersunk)
+            // translate([MATERIAL_THICKNESS / 2, i*PCIE_SPACING_PER_CARD + 4])
+            // circle(d = M2_CLEARANCE_HOLE);
         }
 
         // PCIe bracket drill holes (M4)
@@ -244,31 +244,14 @@ module screw_plate_2d() {
 module slot_plate_2d() {
     difference() {
         union() {
-            translate([-8, 0])
-            hull() {
-                difference() {
-                    square([SIDE_PLATE_WIDTH + 8, HORIZONTAL_PLATE_HEIGHT]);
-
-                    translate([0, HORIZONTAL_PLATE_HEIGHT - ROUNDED_CORNER_RADIUS])
-                    square([ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS]);
-                }
-
-                translate([ROUNDED_CORNER_RADIUS, HORIZONTAL_PLATE_HEIGHT - ROUNDED_CORNER_RADIUS])
-                circle(r = ROUNDED_CORNER_RADIUS);
-            }
+            translate([-SIDE_PLATE_WIDTH, 0])
+            rounded_square([SIDE_PLATE_WIDTH + SIDE_PLATE_WIDTH, HORIZONTAL_PLATE_HEIGHT], corners = [0, 0, ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS]);
 
             // Bottom tabs
-            translate([-2 - 6, -TAB_LENGTH])
-            square([6, TAB_LENGTH]);
-            translate([2, -TAB_LENGTH])
-            square([6, TAB_LENGTH]);
-            translate([16, -TAB_LENGTH])
-            square([6, TAB_LENGTH]);
-            // Top tabs
-            translate([2, HORIZONTAL_PLATE_HEIGHT])
-            square([6, TAB_LENGTH]);
-            translate([16, HORIZONTAL_PLATE_HEIGHT])
-            square([6, TAB_LENGTH]);
+            for(i = [-8, 2]) {
+                translate([i, -TAB_LENGTH])
+                square([6, TAB_LENGTH]);
+            }
         }
 
         slot_height_tolerence = 0.5;
@@ -286,50 +269,35 @@ module slot_plate_2d() {
     }
 }
 
-module cross_plate_2d() {
+// Plate that sits flat against the PCIe bracket and supports the slot and screw plates side on.
+module side_plate_2d() {
+    // X direction is rotated to be the Z direction in final 3D design,
+    // with negative X being "downwards".
+    // X = 0 is the bottom of the PCIe card PCB.
+    // X height must cover both PCIe brackets.
+
     difference() {
-        translate([0, TAB_MARGIN])
-        square([SIDE_PLATE_WIDTH, SLOT_PLATE_Y - TAB_MARGIN + TAB_LENGTH]);
+        union() {
+            translate([0, MATERIAL_THICKNESS])
+            square([HORIZONTAL_PLATE_HEIGHT, SLOT_PLATE_Y - MATERIAL_THICKNESS]);
 
-        // Cutout to access screw holes, and for right angle IO cable routing
-        #hull() {
-            // Align with IO cutout
-            translate([-1, 10.16])
-            square([1, 89.9]);
-
-            translate([SIDE_PLATE_WIDTH - 17 + 1, MATERIAL_THICKNESS + 2*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3])
-            circle(r = ROUNDED_CORNER_RADIUS);
-
-            translate([SIDE_PLATE_WIDTH - 17 + 1, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3])
-            circle(r = ROUNDED_CORNER_RADIUS);
+            // Screw plate tabs
+            for(i = [0:PCIE_CARDS-1]) {
+                translate([i*PCIE_SPACING_PER_CARD + 8, TAB_MARGIN])
+                square([6, TAB_LENGTH]);
+            }
         }
 
-        // Screw plate tab slots
-        union() {
-            translate([2, 0])
-            square([6, MATERIAL_THICKNESS]);
-            translate([16, 0])
-            square([6, MATERIAL_THICKNESS]);
-
-            // Fasting screw clearance hole (M2 countersunk)
-            translate([12, MATERIAL_THICKNESS / 2])
-            circle(d = M2_CLEARANCE_HOLE);
-        }
-
-        // Slot plate tab slots
-        translate([0, SLOT_PLATE_Y])
-        union() {
-            translate([2, 0])
-            square([6, MATERIAL_THICKNESS]);
-            translate([16, 0])
-            square([6, MATERIAL_THICKNESS]);
-
-            // Fasting screw clearance hole (M2 countersunk)
-            translate([12, MATERIAL_THICKNESS / 2])
-            circle(d = M2_CLEARANCE_HOLE);
+        // IO cutouts
+        for(i = [0:PCIE_CARDS-1]) {
+            translate([i * PCIE_SPACING_PER_CARD, 0])
+            translate([1.57 + 0.35, 10.16])
+            square([12.06, 89.9]);
         }
     }
 }
+
+//!side_plate_2d();
 
 module riser_reference_2d() {
     // Riser
@@ -424,9 +392,9 @@ module slot_plate_3d() {
     slot_plate_2d();
 }
 
-module cross_plate_3d() {
-    linear_extrude(height = MATERIAL_THICKNESS)
-    cross_plate_2d();
+module side_plate_3d() {
+    linear_extrude(height = SIDE_PLATE_MATERIAL_THICKNESS)
+    side_plate_2d();
 }
 
 module riser_reference_3d() {
@@ -478,10 +446,11 @@ module gpu_mount_3d() {
     rotate(90, [1, 0, 0])
     slot_plate_3d();
 
-    // Cross plate
+    // Side plate
     color("purple", alpha=0.5)
-    translate([0, 0, MATERIAL_THICKNESS + HORIZONTAL_PLATE_HEIGHT])
-    cross_plate_3d();
+    translate([SIDE_PLATE_MATERIAL_THICKNESS, 0, MATERIAL_THICKNESS])
+    rotate(-90, [0, 1, 0])
+    side_plate_3d();
 
     %translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS, MATERIAL_THICKNESS])
     riser_reference_3d();
@@ -490,6 +459,7 @@ module gpu_mount_3d() {
     %rotate(180)
     pcie_card_reference_3d();
 
+    // PCIe bracket reference
     translate([0, 0, 6])
     rotate(90, [1, 0, 0])
     rotate(-90, [0, 0, 1])
@@ -511,7 +481,10 @@ module gpu_mount_3d() {
 
 if(RENDER_MODE == 0) {
     gpu_mount_3d();
-    
+}
+else if(RENDER_MODE == 10) {
+    // TEST
+    side_plate_2d();
 }
 else {
     if(EXPORT_LAYER == 0 || EXPORT_LAYER == 1) {
