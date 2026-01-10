@@ -21,7 +21,8 @@ use <../Shared/2Dshapes.scad>;
 use <../Shared/rounded_corner.scad>;
 use <pcie_card_bracket.scad>;
 
-include  <../Shared/shared_settings.scad>;
+include <screw_hole_sizes.scad>
+include <../Shared/shared_settings.scad>;
 
 // Render mode:
 //
@@ -55,14 +56,6 @@ $fn = $preview ? 64 : 128;
 
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
-
-// Metric screw hole diameters
-M2_CLEARANCE_HOLE = 2.4;
-M3_CLEARANCE_HOLE = 3.4;
-M4_CLEARANCE_HOLE = 4.5;
-M2_DRILL_HOLE = 1.6; // For tapping
-M3_DRILL_HOLE = 2.5; // For tapping
-M4_DRILL_HOLE = 3.3; // For tapping
 
 // The thickness of the acrylic sheet being cut
 MATERIAL_THICKNESS = 6;
@@ -115,6 +108,12 @@ MOUNTING_HOLES = [
 
     [12 + 13/2, -13/2],
 ];
+
+// Provides the PCIe slot datum offset for scripts consuming this as a library with use
+function gpu_mount_pcie_datum_offset() = PCIE_SLOT_DATUM_OFFSET;
+
+// Provides the bracket mounting holes for scripts consuming this as a library with use
+function gpu_mount_mounting_holes() = MOUNTING_HOLES;
 
 //
 // The primary plate that everything attaches to
@@ -303,10 +302,6 @@ module cross_plate_2d() {
 
             translate([SIDE_PLATE_WIDTH - 17 + 1, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3])
             circle(r = ROUNDED_CORNER_RADIUS);
-
-
-            //[SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 2*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
-            //[SIDE_PLATE_WIDTH - 17, MATERIAL_THICKNESS + 1*(SLOT_PLATE_Y - MATERIAL_THICKNESS)/3],
         }
 
         // Screw plate tab slots
@@ -466,7 +461,7 @@ module pcie_card_reference_3d() {
     pcie_card_reference_2d();
 }
 
-if(RENDER_MODE == 0) {
+module gpu_mount_3d() {
     // Base plate
     base_plate_3d();
 
@@ -512,6 +507,11 @@ if(RENDER_MODE == 0) {
             cylinder(h = HORIZONTAL_PLATE_HEIGHT + 20, d = M4_CLEARANCE_HOLE);
         }
     }
+}
+
+if(RENDER_MODE == 0) {
+    gpu_mount_3d();
+    
 }
 else {
     if(EXPORT_LAYER == 0 || EXPORT_LAYER == 1) {
