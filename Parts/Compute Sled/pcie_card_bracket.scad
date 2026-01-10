@@ -16,7 +16,7 @@ module pcie_bracket_face_reference_2d() {
 
     // Top folded wing tab reference
     translate([-17.15 + 2.54, 0])
-    %square([21.59 - 2.54, SHEET_THICKNESS]);
+    *square([21.59 - 2.54, SHEET_THICKNESS]);
 
     // Wing offset dimension reference
     *translate([-17.15, -4.56])
