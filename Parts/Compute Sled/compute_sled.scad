@@ -29,8 +29,10 @@ use <../Shared/2Dshapes.scad>;
 use <../Shared/tab_strip.scad>;
 use <../Shared/baseplate_screw_holes.scad>;
 use <../Shared/rounded_corner.scad>;
+use <gpu_mount.scad>;
 
-include  <../Shared/shared_settings.scad>;
+include <screw_hole_sizes.scad>
+include <../Shared/shared_settings.scad>;
 
 // Render mode:
 //
@@ -72,6 +74,15 @@ $fn = $preview ? 64 : 128;
 
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
+
+MINI_ITX_MOBO_MOUNTING_HOLES = [
+    [ 0,      0      ] + [10.16, 6.35], // Screw hole C, bottom left
+    [ 154.94, 0      ] + [10.16, 6.35], // Screw hole H, bottom right
+    [ 154.94, 157.48 ] + [10.16, 6.35], // Screw hole J, top right
+    [ 22.86,  157.48 ] + [10.16, 6.35]  // Screw hole F
+];
+
+MOTHERBOARD_PCIE_DATUM_POS = [10.16 + 46.94, 6.35 - 39.37/2 + 20.32];
 
 material_thickness = 4.5;
 tab_height = material_thickness - 0.2;
@@ -335,26 +346,53 @@ module pump_mount_bottom_2d(engrave_mode) {
     }
 }
 
-module mini_itx_screw_holes() {
-    // screw holes relative to the bottom left of the plate
-    mini_itx_screw_coords = [
-        [ 0,      0      ], // Screw hole C, bottom left
-        [ 154.94, 0      ], // Screw hole H, bottom right
-        [ 154.94, 157.48 ], // Screw hole J, top right
-        [ 22.86,  157.48 ] // Screw hole F
-    ];
-
-    for ( i = [0 : 3] ){
-        translate(mini_itx_screw_coords[i] + [10.16, 6.35]) 
-        circle(d = 3.96);
+// The motherboard itself. Used as a layout guide.
+module mini_itx_motherboard_pcb_2d() {
+    difference() {
+        square([170, 170]);
+        
+        union() {
+            for(pos = MINI_ITX_MOBO_MOUNTING_HOLES) {
+                translate(pos)
+                circle(d = MINI_ITX_MOUNTING_CLEARANCE_HOLE);
+            }
+        }
     }
 }
 
-// The motherboard itself. Used as a layout guide.
-module mini_itx_motherboard_2d() {
+module mini_itx_motherboard_3d() {
+    color("purple")
+    linear_extrude(height = 1)
+    mini_itx_motherboard_pcb_2d();
+
+    color("yellow", alpha=0.8)
+    translate(MOTHERBOARD_PCIE_DATUM_POS)
+    pcie_slot_3d();
+}
+
+module pcie_slot_3d() {
     difference() {
-        square([170, 170]);
-        mini_itx_screw_holes();
+        translate([-14.5, 0, 0])
+        rotate(90, [1, 0, 0])
+        rotate(90, [0, 1, 0])
+        linear_extrude(height = 89) 
+        union() {
+            translate([-3.75, 0])
+            square([3.75 * 2, 11]);
+            hull() {
+                translate([-3.75, 7.45])
+                square([3.75 * 2, 11 - 7.45]);
+
+                translate([-5.1, 7.45])
+                square([5.1 + 3.75, 0.8]);
+            }
+        }
+
+        translate([-11.65 - 1.70/2, -2.5/2, 5])
+        cube([11.65, 2.5, 11 - 5 + 0.1]);
+
+        translate([1.70/2, -2.5/2, 5])
+        cube([73.15 - 1.70/2, 2.5, 11 - 5 + 0.1]);
     }
 }
 
@@ -384,16 +422,28 @@ module main_plate_2d() {
             ]);
 
         translate(motherboard_offset)
-        mini_itx_screw_holes();
+        union() {
+            for(pos = MINI_ITX_MOBO_MOUNTING_HOLES) {
+                translate(pos)
+                circle(d = MINI_ITX_MOUNTING_CLEARANCE_HOLE);
+            }
+        }
 
         translate(pump_offset)
         pump_mount_holes();
 
         bulkhead_holes();
 
-        // PCIe riser cable cutout        
-        #translate([50 + motherboard_offset[0] + 20, motherboard_offset[1] - 10/2]) // TODO: Use actual PCIe slot x offset
-        roundedSquare([112, 10], r = 2);
+        // GPU mount holes
+        translate([0, 70])
+        translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset() ,0]) // Horizontally align PCIe slots
+        scale([-1, 1])
+        #union() {
+            for(pos = gpu_mount_mounting_holes()) {
+                translate(pos)
+                circle(d = M4_DRILL_HOLE);
+            }
+        }
     }
 }
 
@@ -424,13 +474,6 @@ module ek_monoblock_3d() {
     }
 }
 
-// Inno3D GeForce RTX 5090 iCHILL Frostbite
-// 204mm x 161mm x 34mm
-module gpu_3d() {
-
-
-}
-
 module compute_sled_3d() {
     rotate([90, 0, 0])
     color("blue")
@@ -438,15 +481,19 @@ module compute_sled_3d() {
         main_plate_2d();
     }
 
+    // GPU bracket
+    translate([0, 0, 70])
+    translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset() ,0]) // Horizontally align PCIe slots
+    rotate(90, [1, 0, 0])
+    rotate(180, [0, 1, 0])
+    gpu_mount_3d();
+
     // Motherboard itself. It sits 8mm above the plate on standoffs.
     translate([0, -7.62, 0])
     rotate([90, 0, 0])
     translate(motherboard_offset)
     union() {
-        color("red")
-        linear_extrude(height = 1) {
-            mini_itx_motherboard_2d();
-        }
+        mini_itx_motherboard_3d();
 
         color("red", alpha=0.3)
         translate([0, 6.60, 1])
