@@ -100,6 +100,8 @@ HORIZONTAL_PLATE_HEIGHT = (PCIE_CARDS * PCIE_SPACING_PER_CARD) - (PCIE_SPACING_P
 
 SLOT_PLATE_Y = RISER_Y_POS - 5.5 - 7 + 19.7 - 6 - 1;
 
+SIDE_PLATE_LENGTH = SLOT_PLATE_Y - MATERIAL_THICKNESS;
+
 MOUNTING_HOLES = [
     [28 - 116 - 6, 12] + [-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS],
     [28 - 116 - 6, -6] + [-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS],
@@ -159,6 +161,17 @@ module base_plate_2d() {
             translate([12.5, MATERIAL_THICKNESS / 2])
             circle(d = M2_CLEARANCE_HOLE);
         }
+
+        // Side plate tab slots
+        // TEST
+        translate([0, MATERIAL_THICKNESS])
+        square([SIDE_PLATE_MATERIAL_THICKNESS, SIDE_PLATE_LENGTH]);
+        // union() {
+        //     for(i = [1:2:4]) {
+        //         translate([0, MATERIAL_THICKNESS + i*(SIDE_PLATE_LENGTH / 6)])
+        //         square([SIDE_PLATE_MATERIAL_THICKNESS, SIDE_PLATE_LENGTH / 6]);
+        //     }
+        // }
 
         // Mounting screw holes (M4)
         union() {
@@ -279,12 +292,18 @@ module side_plate_2d() {
     difference() {
         union() {
             translate([0, MATERIAL_THICKNESS])
-            square([HORIZONTAL_PLATE_HEIGHT, SLOT_PLATE_Y - MATERIAL_THICKNESS]);
+            square([HORIZONTAL_PLATE_HEIGHT, SIDE_PLATE_LENGTH]);
 
             // Screw plate tabs
             for(i = [0:PCIE_CARDS-1]) {
                 translate([i*PCIE_SPACING_PER_CARD + 8, TAB_MARGIN])
                 square([6, TAB_LENGTH]);
+            }
+
+            // Base plate tabs
+            for(i = [1:2:4]) {
+                translate([-TAB_LENGTH, MATERIAL_THICKNESS + i*(SIDE_PLATE_LENGTH / 5)])
+                square([TAB_LENGTH, SIDE_PLATE_LENGTH / 5]);
             }
         }
 
@@ -299,6 +318,9 @@ module side_plate_2d() {
 
 //!side_plate_2d();
 
+// Riser 2D reference.
+// X = 0 is the PCIe slot datum
+// Y = 0 is the screw hole center line
 module riser_reference_2d() {
     // Riser
     difference() {
