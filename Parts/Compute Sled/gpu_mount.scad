@@ -282,7 +282,6 @@ module riser_shim_plate_2d() {
         square([89 + 2 + 2, 25]);
 
         // PCIe slot datum to outer face of bracket: 59.05mm delta X
-        //translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS])
         riser_mounting_holes();
     }
 }
@@ -372,7 +371,8 @@ module slot_plate_2d() {
         }
 
         // Side plate tab slot
-        square([SIDE_PLATE_MATERIAL_THICKNESS, 20]);
+        translate([0, -TAB_LENGTH])
+        square([SIDE_PLATE_MATERIAL_THICKNESS, 20 + TAB_LENGTH]);
         
         // PCIe bracket tab slots
         translate([0, RISER_SHIM_HEIGHT]) 
@@ -396,7 +396,23 @@ module side_plate_2d() {
     difference() {
         union() {
             translate([0, MATERIAL_THICKNESS])
-            rounded_square([HORIZONTAL_PLATE_HEIGHT, RISER_Y_POS - 5.5 - 7 + 35 - MATERIAL_THICKNESS], corners = [0, 0, ROUNDED_CORNER_RADIUS, 0]);
+            square([HORIZONTAL_PLATE_HEIGHT, RISER_Y_POS]);
+
+            translate([0, RISER_Y_POS + MATERIAL_THICKNESS])
+            intersection() {
+                square([HORIZONTAL_PLATE_HEIGHT, -5.5 - 7 + 35 - MATERIAL_THICKNESS]);
+
+                hull() {
+                    square([RISER_SHIM_HEIGHT, -5.5 - 7 + 35 - MATERIAL_THICKNESS]);
+                    square([HORIZONTAL_PLATE_HEIGHT, 2]);
+
+                    translate([RISER_SHIM_HEIGHT, -5.5 - 7 + 35 - MATERIAL_THICKNESS - ROUNDED_CORNER_RADIUS])
+                    circle(r = ROUNDED_CORNER_RADIUS);
+
+                    translate([HORIZONTAL_PLATE_HEIGHT - ROUNDED_CORNER_RADIUS, 2])
+                    circle(r = ROUNDED_CORNER_RADIUS);
+                }
+            }
 
             // Screw plate tabs
             translate([6, TAB_MARGIN])
@@ -419,7 +435,7 @@ module side_plate_2d() {
         }
 
         // Slot plate cutout
-        translate([20, RISER_Y_POS])
+        translate([20, SLOT_PLATE_Y])
         square([HORIZONTAL_PLATE_HEIGHT - 20 + 0.01, MATERIAL_THICKNESS]);
 
         // Fastening screw clearance hole (M2 countersunk)
