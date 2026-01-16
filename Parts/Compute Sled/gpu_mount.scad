@@ -27,7 +27,7 @@ include <../Shared/shared_settings.scad>;
 
 $fn = $preview ? 64 : 128;
 
-VERSION = "v1.1";
+VERSION = "v1.2";
 
 // Render mode:
 //
