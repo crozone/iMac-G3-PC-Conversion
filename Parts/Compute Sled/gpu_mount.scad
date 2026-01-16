@@ -110,7 +110,7 @@ PCIE_CARD_Z_OFFSET = MATERIAL_THICKNESS + RISER_SHIM_HEIGHT;
 // The height of the horizontal plates. Must be large enough to provide clearance for the PCIe brackets and IO connectors.
 HORIZONTAL_PLATE_HEIGHT = (PCIE_CARDS * PCIE_SPACING_PER_CARD) - (PCIE_SPACING_PER_CARD - (1.57 + 0.35 + 12.06)) + RISER_SHIM_HEIGHT + 3;
 
-SCREW_PLATE_EXTRA_HEIGHT = 6;
+SCREW_PLATE_EXTRA_HEIGHT = 7;
 SCREW_PLATE_HEIGHT = HORIZONTAL_PLATE_HEIGHT + SCREW_PLATE_EXTRA_HEIGHT;
 
 SLOT_PLATE_Y = RISER_Y_POS - 5.5 - 7 + 19.7 - 6 - 1;
@@ -169,9 +169,9 @@ module base_plate_2d() {
 
             // Fastening screw clearance holes (M2)
             translate([SIDE_PLATE_WIDTH - 6/2, MATERIAL_THICKNESS / 2])
-            circle(d = M2_CLEARANCE_HOLE);
+            circle(d = M3_CLEARANCE_HOLE);
             translate([-11 - 6/2, MATERIAL_THICKNESS / 2])
-            circle(d = M2_CLEARANCE_HOLE);
+            circle(d = M3_CLEARANCE_HOLE);
         }
 
         // Screw plate tab slots
@@ -184,7 +184,7 @@ module base_plate_2d() {
 
             // Fastening screw clearance hole (M2 countersunk)
             translate([12, MATERIAL_THICKNESS / 2])
-            circle(d = M2_CLEARANCE_HOLE);
+            circle(d = M3_CLEARANCE_HOLE);
         }
 
         // Side plate tab slots
@@ -454,8 +454,8 @@ module side_plate_2d() {
                     }
 
                     // Extra wrap around tab to attach to screw plate
-                    translate([SCREW_PLATE_HEIGHT - 8, -5])
-                    rounded_square([8, MATERIAL_THICKNESS + 5], corners = [ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS, 0, 0]);
+                    translate([HORIZONTAL_PLATE_HEIGHT - 2, -5])
+                    rounded_square([SCREW_PLATE_EXTRA_HEIGHT + 2, MATERIAL_THICKNESS + 5], corners = [ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS, 0, 0]);
                 }
 
                 // Slot plate tab
@@ -463,8 +463,8 @@ module side_plate_2d() {
                 square([3, MATERIAL_THICKNESS]);
 
                 // OR screw hole for screwing into tapped hole in screw plate
-                translate([SCREW_PLATE_HEIGHT - 3, MATERIAL_THICKNESS / 2])
-                circle(d = M2_CLEARANCE_HOLE);
+                translate([HORIZONTAL_PLATE_HEIGHT + 3, MATERIAL_THICKNESS / 2])
+                circle(d = M3_CLEARANCE_HOLE);
             }
 
             // Base plate tabs
@@ -490,7 +490,7 @@ module side_plate_2d() {
         union() {
             for(i = [0:2:4]) {
                 translate([MATERIAL_THICKNESS / 2, i * SIDE_PLATE_LOWER_TABS_LENGTH / 5])
-                circle(d = M2_CLEARANCE_HOLE);
+                circle(d = M3_CLEARANCE_HOLE);
             }
         }
 
