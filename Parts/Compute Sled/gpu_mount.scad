@@ -340,11 +340,12 @@ module screw_plate_2d() {
 
         // Side plate tabs
         union() {
-            square([SIDE_PLATE_MATERIAL_THICKNESS, 6 + 10]);
+            translate([-0.1, 6])
+            square([SIDE_PLATE_MATERIAL_THICKNESS + 0.1, 10]);
 
             difference() {
-                translate([0, PCIE_SPACING_PER_CARD + 6])
-                square([SIDE_PLATE_MATERIAL_THICKNESS, SCREW_PLATE_HEIGHT - (6 + PCIE_SPACING_PER_CARD)]);
+                translate([-0.1, PCIE_SPACING_PER_CARD + 6])
+                square([SIDE_PLATE_MATERIAL_THICKNESS + 0.1, SCREW_PLATE_HEIGHT - (6 + PCIE_SPACING_PER_CARD)]);
 
 
                 // OPTIONAL: Tab. Disable if using tapped screw hole.
