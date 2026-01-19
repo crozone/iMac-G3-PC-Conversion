@@ -76,11 +76,32 @@ ROUNDED_CORNER_RADIUS = 3;
 TAB_MARGIN = MATERIAL_THICKNESS / 12;
 TAB_LENGTH = MATERIAL_THICKNESS - TAB_MARGIN;
 
-// The distance from the PCIe slot datum (the tab in between the power and data parts of the PCIe slot) and the outer face of the PCIe card bracket
+// The distance from the PCIe slot datum (the tab in between the power and data parts of the PCIe slot) and the outer face of the PCIe card bracket (from specification)
 PCIE_SLOT_DATUM_OFFSET = 59.05;
 
-// PCIe bracket height from screw mounting face to lower edge of PCB
+// PCIe bracket height from screw mounting face to lower edge of PCB (from specification)
 PCIE_BRACKET_HEIGHT = 100.36;
+
+// Tweaks for the PCIe bracket IO cutout dimensions.
+// This deviates the IO cutout size and position from the official specification in order to better accommodate the ports on a GPU,
+// while strengthening the plate where ports are not present.
+// Perspective is from the PCIe spec drawings, in which the card is vertical, looking from the inside of the case outwards (PCIe PCB is to the right of the bracket).
+// The variable is an array of [ Left, Top, Right, Bottom ] arrays, where each element is a tweak for each PCIe slot.
+ENABLE_PCIE_BRACKET_IO_CUTOUT_TWEAK = true;
+
+// Version tuned for ASUS TUF GPUs with 3x DisplayPorts and 1x HDMI port on the 1st slot, and 1x HDMI port on the 2nd slot.
+PCIE_BRACKET_IO_CUTOUT_TWEAK = ENABLE_PCIE_BRACKET_IO_CUTOUT_TWEAK ?
+[
+    [-1.5, 2, -2, -7],
+    [-1.5, -57, -2, -7]
+]
+:
+[
+     [0, 0, 0, 0],
+     [0, 0, 0, 0]
+];
+
+SIDE_PLATE_VERSION_TEXT = ENABLE_PCIE_BRACKET_IO_CUTOUT_TWEAK ? "ASUS TUF GPU" : "PCIe Reference";
 
 // Riser position is relative to screw holes
 // The position is the sum of:
@@ -89,7 +110,7 @@ PCIE_BRACKET_HEIGHT = 100.36;
 // * 5.5mm between the top of the riser PCB and the riser screw hole center
 RISER_Y_POS = PCIE_BRACKET_HEIGHT + 7 + 5.5;
 
-// Spacing in between PCIe card slots
+// Spacing in between PCIe card slots (from specification)
 PCIE_SPACING_PER_CARD = 20.32;
 
 // The number of slots the PCIe card will occupy
@@ -498,9 +519,24 @@ module side_plate_2d() {
         translate([RISER_SHIM_HEIGHT, 0])
         translate([1.57 + 0.35, 10.16])
         for(i = [0:PCIE_CARDS-1]) {
+            io_tweak = PCIE_BRACKET_IO_CUTOUT_TWEAK[i];
+
             translate([i * PCIE_SPACING_PER_CARD, 0])
-            square([12.06, 89.9]);
+            translate([io_tweak[0], -io_tweak[1]])
+            square([12.06, 89.9] - [io_tweak[0], -io_tweak[1]] + [io_tweak[2], io_tweak[3]]);
         }
+    }
+}
+
+module side_plate_engrave_2d() {
+    color("red")
+    translate([HORIZONTAL_PLATE_HEIGHT - 4, RISER_Y_POS - 3])
+    scale([-1, 1, 1])
+    union()
+    {
+        text(text = str("PCIe IO"), font = text_font, size = 2.5, halign = "left", valign = "top");
+        translate([0, -4])
+        text(text = SIDE_PLATE_VERSION_TEXT, font = text_font, size = 2, halign = "left", valign = "top");
     }
 }
 
@@ -612,8 +648,14 @@ module slot_plate_3d() {
 }
 
 module side_plate_3d() {
-    linear_extrude(height = SIDE_PLATE_MATERIAL_THICKNESS)
-    side_plate_2d();
+    difference() {
+        linear_extrude(height = SIDE_PLATE_MATERIAL_THICKNESS)
+        side_plate_2d();
+
+        translate([0, 0, SIDE_PLATE_MATERIAL_THICKNESS - 0.2])
+        linear_extrude(height = 0.2 + 0.01)
+        side_plate_engrave_2d();
+    }
 }
 
 module riser_reference_3d() {
@@ -725,6 +767,7 @@ else if(RENDER_MODE == 5) {
 }
 else if(RENDER_MODE == 6) {
     if(CUT) side_plate_2d();
+    if(ENGRAVE) side_plate_engrave_2d();
 }
 else {
     // if(EXPORT_LAYER == 0 || EXPORT_LAYER == 1) {
