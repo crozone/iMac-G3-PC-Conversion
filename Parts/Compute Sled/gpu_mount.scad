@@ -230,15 +230,23 @@ module base_plate_2d() {
 }
 
 module base_plate_engrave_2d() {
+    module riser_overlap() {
+        intersection() {
+            translate([PCIE_SLOT_DATUM_OFFSET, -RISER_Y_POS])
+            base_plate_2d();
+            riser_shim_plate_2d();
+        }
+    }
+
     // Glue trap for shim
     color("black")
     translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS])
     difference() {
         offset(r = -1)
-        riser_shim_plate_2d();
+        riser_overlap();
 
         offset(r = -2)
-        riser_shim_plate_2d();
+        riser_overlap();
     }
 
     color("red")
@@ -260,7 +268,13 @@ module riser_shim_plate_2d() {
         translate([PCIE_SLOT_DATUM_OFFSET, 0]) 
         translate([SIDE_PLATE_WIDTH, -5.5 - 7])
         translate([-165 - SIDE_PLATE_WIDTH, 0])
-        rounded_square([147, 35], r = ROUNDED_CORNER_RADIUS);
+        union() {
+            rounded_square([147, 35], corners = [0, ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS]);
+
+            // TODO: Decide height
+            translate([0, -8])
+            #rounded_square([15.5, 8], corners = [ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS, 0, 0]);
+        }
 
         // Mounting screw holes (M4)
         translate([PCIE_SLOT_DATUM_OFFSET, -RISER_Y_POS])
@@ -269,6 +283,15 @@ module riser_shim_plate_2d() {
                 translate(pos)
                 circle(d = M4_CLEARANCE_HOLE);
             }
+        }
+
+        // Cutout for PCIe edge connector locking tab thingy
+        translate([-89 + 14.5 - 2, -5.5 - 7])
+        translate([-12, 0])
+        hull() {
+        square([12, 2]);
+            translate([-(14 - 12), -4])
+            square([14, 4]);
         }
 
         // Cutout for plastic support
@@ -534,34 +557,98 @@ module riser_reference_2d() {
     }
 }
 
+//!pcie_card_reference_2d();
+
 module pcie_card_reference_2d() {
     translate([0, -PCIE_BRACKET_HEIGHT])
-    union() {
+    difference() {
+        union() {
+            translate([PCIE_SLOT_DATUM_OFFSET, 0])
+            difference() {
+                union() {
+                    // PCIe card slot
+
+                    // Power
+                    translate([-11 - 1, -4])
+                    *square([11, 12]);
+
+                    // Data
+                    translate([1, -4])
+                    *square([71, 12]);
+
+                    // Combined version for rounded slot
+                    translate([-11 - 1, -4])
+                    square([11 + 2 + 71, 12]);
+
+                }
+
+                
+            }
+
+            // PCIe slot and PCB
+            union() {
+                translate([2, 0])
+                square([17 - 2, 90]);
+
+                translate([35, 0])
+                square([8, 8]);
+
+                // Gap fill for rounded slot
+                translate([35 + 8, 0])
+                square([4.05, 8]);
+
+                translate([17 - 2 + 2, 8])
+                square([232 - 17 - 2, 127]); // 5090 TUF PCB measurements
+            }
+
+            // Locking tab
+            // TODO: Verify exact measurements
+            translate([PCIE_SLOT_DATUM_OFFSET, 0])
+            translate([1 + 71, 0])
+            union() {
+                translate([4, 0]) 
+            #hull() {
+                translate([0, -1])
+                square([10, 2.5]);
+
+                translate([0, -1 + 2.5])
+                square([12, 2.5]);
+            }
+            
+            %translate([0, -1])
+            square([4, 9]);
+
+            }
+        }
+
+        // Rounded cutout in-between square tab and PCIe edge connector
+        translate([35 + 8, 0])
+        hull()
+        {
+            translate([4.05/2, 6 - 1])
+            circle(d = 4.05);
+
+            translate([0, -0.1])
+            square([4.05, 4]);
+        }
+
+        // Rounded cutout in-between PCIe edge connector Power and Data sections
         translate([PCIE_SLOT_DATUM_OFFSET, 0])
-        union() {
-            // PCIe card slot
+        hull()
+        {
+            translate([0, 6 - 1])
+            circle(r = 1);
 
-            // Power
-            translate([-11 - 1, -4])
-            square([11, 12]);
-
-            // Data
-            translate([1, -4])
-            square([71, 12]);
-
+            translate([-2/2, -4 - 0.1])
+            square([2, 2]);
         }
 
-        // PCIe slot and PCB
-        union() {
-            translate([2, 0])
-            square([17 - 2, 90]);
+        // Rounded cutout in-between PCIe edge connector and locking tab
+        // TODO
 
-            translate([35, 0])
-            square([8, 8]);
-
-            translate([17 - 2 + 2, 8])
-            square([232 - 17 - 2, 127]); // 5090 TUF PCB measurements
-        }
+        // Rounded cutout above locking tab
+        // TODO
+        
     }
 }
 
