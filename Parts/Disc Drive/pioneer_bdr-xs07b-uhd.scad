@@ -17,7 +17,6 @@ DRIVE_HEIGHT = 15;
 FEET_DIMENSIONS = [121.5, 3.5, 0.5];
 
 module drive() {
-    
     difference() {
         union() {
             // Base
@@ -30,16 +29,15 @@ module drive() {
             color("gray")
             translate([0, 0, DRIVE_BASE_HEIGHT])
             hull() {
-            linear_extrude(height = DRIVE_HEIGHT)
-            translate(-DRIVE_DIMENSIONS/2)
-            rounded_square(DRIVE_DIMENSIONS, r = DRIVE_RADIUS);
+                linear_extrude(height = DRIVE_HEIGHT)
+                translate(-DRIVE_DIMENSIONS/2)
+                rounded_square(DRIVE_DIMENSIONS, r = DRIVE_RADIUS);
 
-            linear_extrude(height = 0.1)
-            translate(-DRIVE_DIMENSIONS_LOWER/2)
-            rounded_square(DRIVE_DIMENSIONS_LOWER, r = DRIVE_RADIUS);
-
+                linear_extrude(height = 0.1)
+                translate(-DRIVE_DIMENSIONS_LOWER/2)
+                rounded_square(DRIVE_DIMENSIONS_LOWER, r = DRIVE_RADIUS);
             }
-            
+
             // Eject button
             color("yellow")
             translate([-DRIVE_DIMENSIONS[0]/2 + 13, -DRIVE_DIMENSIONS[1]/2 - 1, DRIVE_BASE_HEIGHT + 1.8])
@@ -56,8 +54,8 @@ module drive() {
         }
 
         // Slot
-        translate([0, -DRIVE_DIMENSIONS[1]/2, DRIVE_BASE_HEIGHT + DRIVE_HEIGHT - 3.5])
-        #cube([123.5, 5, 2], center = true);
+        translate([-123.5/2, -DRIVE_DIMENSIONS[1]/2 - 5 + 1, DRIVE_BASE_HEIGHT + DRIVE_HEIGHT - 3.5 - 2])
+        #cube([123.5, 5, 2]);
 
         // USB C port
         translate([-DRIVE_DIMENSIONS[0]/2 + 15, DRIVE_DIMENSIONS[1]/2 - 5/2, DRIVE_BASE_HEIGHT + 2.2])
