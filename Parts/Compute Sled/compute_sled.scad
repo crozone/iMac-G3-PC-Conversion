@@ -29,6 +29,7 @@ use <../Shared/2Dshapes.scad>;
 use <../Shared/tab_strip.scad>;
 use <../Shared/baseplate_screw_holes.scad>;
 use <../Shared/rounded_corner.scad>;
+use <../Shared/rounded_square.scad>;
 use <gpu_mount.scad>;
 
 include <screw_hole_sizes.scad>
@@ -86,29 +87,26 @@ MOTHERBOARD_PCIE_DATUM_POS = [10.16 + 46.94, 6.35 - 39.37/2 + 20.32];
 
 material_thickness = 4.5;
 tab_height = material_thickness - 0.2;
-top_mount_y = 203;
 
-// How far forwards and backwards the bottom plate extends, which informs the depth of the rear bracket as well
-rear_depth = 53;
-front_depth = 15 + 15;
-
-// Plate height is based directly off the top mount screw Y position.
-// The top edge is always 15mm higher than the screws, less some buffer.
-plate_size = [90, top_mount_y + (15 - 2)];
-rear_plate_size = [rear_depth, 140];
-bottom_plate_size = [plate_size[0], front_depth + rear_depth];
-
-plate_corner_radius = [4, 4];
-
+// TODO: Documentn what these are
 plate_screw_hole_diameter = 6.6;
 plate_screw_hole_distance = 55;
+
+// Overall size of the main motherboard mounting plate.
+plate_size =
+[
+    19 + 170 + 85, // 170mm for the motherboard, 85mm for the pump
+    40 + 170 + 20 // 40mm above the deck, 170mm for the motherboard, 20mm for top attachments
+];
+
+// Plate offset.
+// X = 0 is the edge of the motherboard and aligns with the IO plate, so
+// offsetting the plate allows for overhang.
+plate_offset = [-19, 0];
 
 // X is measured from middle of pump mount.
 // Y is measured from the bottom screw of pump mount.
 pump_pos = [50, 50];
-
-
-rear_plate_x_offset = (plate_size[0] / 2) - (material_thickness / 2);
 
 // Settings for placeholder GTX 295
 gpu_y_start = 4;
@@ -130,6 +128,86 @@ module module_label(submodule_name) {
 
         translate([0, -4])
         text(text = text_line2, font = text_font, size = 2, halign = "center", valign = "top");
+    }
+}
+
+module pump_3d() {
+    // X = 0 runs down the centerline of the pump
+    // Y = 0 runs down the centerline of the pump
+    // Z = 0 is the top of the mounting bracket
+
+    // Back of mounting plate is at Y = 42
+    // There is a gap of 12mm between the pump body and wall
+
+    // Mounting plate
+    color("Grey")
+    union() {
+        // Back
+        translate([-66/2, 40, 24 - 32])
+        cube([66, 2, 32]);
+
+        // Flat
+        translate([0, 0, 24 - 2])
+        hull() {
+            translate([-66/2, 40 - 5, 0])
+            cube([66, 5, 2]);
+
+            translate([-50/2, 40 - 17, 0])
+            cube([50, 17, 2]);
+        }
+    }
+
+    // Pump
+    union() {
+        // D5 pump body
+        color("SlateGray")
+        translate([0, 0, -33])
+        cylinder(d = 60, h = 33);
+
+        color("DarkGray")
+        union() {
+            hull() {
+                translate([0, 0, 13.5 - 10])
+                cylinder(d = 72, h = 10);
+                cylinder(d = 67, h = 13.5);
+            }
+
+            translate([0, 0, 13.5])
+            cylinder(d = 68, h = 1);
+
+            translate([0, 0, 13.5 + 1])
+            hull() {
+                cylinder(d = 72, h = 12 - 1);
+
+                translate([0, 0, 12 - 1]) 
+                intersection() {
+                    cylinder(d = 72, h = 10);
+                    translate([-38/2, -72/2, 0])
+                    cube([38, 72, 10]);
+                }
+
+                // Outlet port
+                // X - 16 off center
+                translate([-16, -72/2 + 20, 21 - 18.5/2])
+                rotate(90, [1, 0, 0])
+                cylinder(h = 20, d = 18.5);
+            }
+        }
+
+        // Outlet fitting
+        color("DarkSlateGray")
+        translate([0, 0, 13.5 + 1])
+        translate([-16, -72/2, 21 - 18.5/2])
+        rotate(90, [1, 0, 0])
+        cylinder(h = 10, d = 19);
+    }
+
+    // Top filter
+    color("silver")
+    translate([0, 0, 13.5 + 22])
+    hull() {
+        cylinder(d = 25, h = 5);
+        cylinder(d = 18, h = 10);
     }
 }
 
@@ -207,143 +285,6 @@ module cable_tie_holes() {
 module cables_through_hole() {
     edge_d = [3, 3];
     complexRoundSquare([20, 25], rads1=[0, 0], rads2=[0, 0], rads3=edge_d, rads4=[0, 0], center=false);
-
-}
-
-module pump_mount_main_2d(engrave_mode) {
-    // The top plate bounds. Centered around [0,0].
-    module plate() {
-        // Round the top left and right corners
-        // complexRoundSquare(size, top left radius, top right radius, bottom right radius, bottom left radius, center)
-        union() {
-            translate([0, material_thickness])
-            complexRoundSquare(plate_size - [0, material_thickness], rads1=[0, 0], rads2=[0, 0], rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
-
-            translate([plate_size[0] / 2, material_thickness - tab_height])
-            tab_strip(width = plate_size[0], tab_width = 10, tab_height = tab_height + $eps, inverse = true);
-        }
-    }
-
-    module part() {
-        difference() {
-            plate();
-
-            translate([plate_size[0] / 2, top_mount_y])
-            mount_screw_holes();
-
-            bulkhead_holes();
-
-            translate(pump_pos)
-            pump_mount_holes();
-
-            translate([2, 35])
-            cable_tie_holes();
-
-            cables_through_hole();
-        }
-    }
-
-    module engrave() {
-        translate([68, 25])
-        module_label("Front Plate");
-
-        bulkhead_labels();
-    }
-
-    if(engrave_mode <= 1) {
-        part();
-    }
-
-    if(engrave_mode >= 1) {
-        #engrave();
-    }
-}
-
-module pump_mount_bottom_2d(engrave_mode) {
-    module plate() {
-        //complexRoundSquare(bottom_plate_size, rads1=plate_corner_radius, rads2=plate_corner_radius, rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
-       
-        extension_width = 30;
-        extension_length = 32;
-        wide_length = rear_depth - extension_length;
-    
-        complexRoundSquare([bottom_plate_size[0], front_depth + wide_length], rads1=plate_corner_radius, rads2=[15, 15], rads3=[15, 15], rads4=plate_corner_radius, center=false);
-
-        extension_offset = [rear_plate_x_offset - extension_width / 2 + material_thickness / 2, front_depth + wide_length - $eps];
-
-        translate(extension_offset)
-        complexRoundSquare([extension_width, extension_length + $eps], rads1=[0, 0], rads2=[0, 0], rads3=plate_corner_radius, rads4=plate_corner_radius, center=false);
-
-        translate(extension_offset)
-        {
-            translate([$eps, $eps])
-            translate([-10, 10])
-            rotate(270)
-            rounded_corner(10);
-
-            translate([extension_width - $eps, -$eps])
-            translate([10, 10])
-            rotate(180)
-            rounded_corner(10);
-        }
-    }
-
-    module main_plate_tabs_receptacle() {
-        difference() {
-            translate([plate_size[0] / 2, 0])
-            tab_strip(width = plate_size[0], tab_width = 10, tab_height = tab_height + $eps, inverse = true);
-
-            translate([0, -$eps])
-            square([20, tab_height + $eps * 2]);
-        }
-    }
-
-    module baseplate_screw_holes() {
-        origin_offset = [0, 0];
-
-        screw_positions = [
-            // This 0,0 screw is supposed to be in line with the mobo mounting screws
-            origin_offset + baseplate_screwhole_offset([0, 0], false),
-            origin_offset + baseplate_screwhole_offset([0, 2], false),
-            origin_offset + baseplate_screwhole_offset([7, 0], false),
-            origin_offset + baseplate_screwhole_offset([7, 2], false),
-        ];
-
-        // Screw holes for mounting to baseplate
-        for (this_pos = screw_positions) {
-            translate(this_pos)
-            baseplate_screw_hole();
-        }
-    }
-    
-    module part() {
-        difference() {
-            translate([0, -front_depth])
-            plate();
-
-            translate([0, -tab_height])
-            main_plate_tabs_receptacle();
-
-            translate([17.5 - 2, -17])
-            baseplate_screw_holes();
-
-            translate([rear_plate_x_offset, 0])
-            rear_plate_tabs_receptacle();
-        }
-    }
-
-    module engrave() {
-        translate([plate_size[0] / 2, -15])
-        module_label("Bottom Plate");
-    }
-
-    if(engrave_mode <= 1) {
-        part();
-    }
-
-    if(engrave_mode >= 1) {
-        #engrave();
-    }
 }
 
 // The motherboard itself. Used as a layout guide.
@@ -406,20 +347,26 @@ module bulkhead_holes() {
         circle(d = bulkhead_hole_diameter);
         text(text = "GPU LOOP", font = text_font, size = 3, halign = "center", valign = "top");
     }
-
 }
 
-motherboard_offset = [0, 40];
+motherboard_offset = [0, 35];
 pump_offset = [170 + 50, 50];
+
+// GPU mount top is 270 above plane
+//gpu_mount_offset = [0, 70];
+gpu_mount_offset = motherboard_offset + [0, 35];
 
 // The main vertical back plate that everything mounts to.
 module main_plate_2d() {
+    // Height of gap between the floor and the bottem edge of the motherboard. 
+    base_offset = motherboard_offset[1] + 5;
+
     difference() {
-        translate([-19, 0])
-        square([
-            19 + 170 + 85, // 170mm for the motherboard, 85mm for the pump
-            40 + 170 + 40 // 40mm above the deck, 170mm for the motherboard, 40mm for top attachments
-            ]);
+        // translate(plate_offset)
+        // square(plate_size);
+
+        translate(plate_offset)
+        rounded_square(plate_size, corners=[undef, undef, 5, 5]);
 
         translate(motherboard_offset)
         union() {
@@ -432,13 +379,16 @@ module main_plate_2d() {
         translate(pump_offset)
         pump_mount_holes();
 
-        bulkhead_holes();
+        // PCIe cutout below motherboard
+        // Rounded square at top
+        translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - 25, 0])
+        rounded_square([110, motherboard_offset[1] + 5], corners=[undef,undef,2,2]);
 
         // GPU mount holes
-        translate([0, 70])
-        translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset() ,0]) // Horizontally align PCIe slots
+        translate(gpu_mount_offset)
+        translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset(), 0]) // Horizontally align PCIe slots
         scale([-1, 1])
-        #union() {
+        union() {
             for(pos = gpu_mount_mounting_holes()) {
                 translate(pos)
                 circle(d = M4_DRILL_HOLE);
@@ -482,7 +432,7 @@ module compute_sled_3d() {
     }
 
     // GPU bracket
-    translate([0, 0, 70])
+    translate([gpu_mount_offset[0], 0, gpu_mount_offset[1]])
     translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset() ,0]) // Horizontally align PCIe slots
     rotate(90, [1, 0, 0])
     rotate(180, [0, 1, 0])
@@ -504,29 +454,10 @@ module compute_sled_3d() {
         translate([-1, 15, 0]) // TODO: Approximate, needs measurement
         ek_monoblock_3d();
     }
+
+    // Pump reference model
+    translate([pump_offset[0], -42 - material_thickness, pump_offset[1]])
+    %pump_3d();
 }
 
 compute_sled_3d();
-
-// if(RENDER_MODE == 0) {
-//     pump_mount_3d(ENGRAVE_MODE);
-// }
-// else if(RENDER_MODE == 1) {
-//     pump_mount_main_2d(ENGRAVE_MODE);
-
-//     translate([134, 153])
-//     rotate(270)
-//     pump_mount_bottom_2d(ENGRAVE_MODE);
-
-//     translate([97, 0])
-//     pump_mount_rear_2d(ENGRAVE_MODE);
-// }
-// else if(RENDER_MODE == 2) {
-//     pump_mount_main_2d(ENGRAVE_MODE);
-// }
-// else if(RENDER_MODE == 3) {
-//     pump_mount_bottom_2d(ENGRAVE_MODE);
-// }
-// else if(RENDER_MODE == 4) {
-//     pump_mount_rear_2d(ENGRAVE_MODE);
-// }
