@@ -857,7 +857,7 @@ module gpu_mount_3d() {
     %union() {
         for(pos = MOUNTING_HOLES) {
             translate(pos)
-            cylinder(h = HORIZONTAL_PLATE_HEIGHT + 20, d = M4_CLEARANCE_HOLE);
+            cylinder(h = HORIZONTAL_PLATE_HEIGHT + 5, d = M4_CLEARANCE_HOLE);
         }
     }
 }
