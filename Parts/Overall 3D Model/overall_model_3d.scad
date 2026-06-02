@@ -8,30 +8,34 @@ use <../PSU Mount/psu_mount_2D.scad>;
 use <../Motherboard Fixture/motherboard_fixture_3d.scad>;
 use <../Reservoir Assembly/reservoir_assy.scad>;
 use <../Connecting Tabs/angle_tab_2d.scad>;
+use <../Compute Sled/compute_sled.scad>;
 
 include  <../Shared/shared_settings.scad>;
 
 $fn=256;
 
+// A very small distance to overcome rounding errors
+$eps = pow(2, -15);
+
 tab_height = material_thickness; // Same as material thickness.
 
-translate([0, 0, 230])
-union() {
-    top_mount_3d();
+// translate([0, 0, 230])
+// union() {
+//     top_mount_3d();
 
-    tab_offset_a = 5 + 2.5;
-    tab_offset_b = 5 + 2.5;
+//     tab_offset_a = 5 + 2.5;
+//     tab_offset_b = 5 + 2.5;
 
-    translate([113 - (material_thickness / 2), 75 - 35 + tab_offset_a]) // 10mm inset from the oute edge of the tab
-    rotate([0, 90, 0])
-    rotate([0, 0, -90])
-    angle_tab_3d(angle = 90 + radiator_angle, offset_a = tab_offset_a, offset_b = tab_offset_b);
+//     translate([113 - (material_thickness / 2), 75 - 35 + tab_offset_a]) // 10mm inset from the oute edge of the tab
+//     rotate([0, 90, 0])
+//     rotate([0, 0, -90])
+//     angle_tab_3d(angle = 90 + radiator_angle, offset_a = tab_offset_a, offset_b = tab_offset_b);
 
-    translate([-113 - (material_thickness / 2), 75 - 35 + tab_offset_a]) // 10mm inset from the oute edge of the tab
-    rotate([0, 90, 0])
-    rotate([0, 0, -90])
-    angle_tab_3d(angle = 90 + radiator_angle, offset_a = tab_offset_a, offset_b = tab_offset_b);
-}
+//     translate([-113 - (material_thickness / 2), 75 - 35 + tab_offset_a]) // 10mm inset from the oute edge of the tab
+//     rotate([0, 90, 0])
+//     rotate([0, 0, -90])
+//     angle_tab_3d(angle = 90 + radiator_angle, offset_a = tab_offset_a, offset_b = tab_offset_b);
+// }
 
 // translate([0, 75 - 30, 230])
 // translate([0, 0, 2])
@@ -73,5 +77,11 @@ translate([0, -get_rad_mount_height(), 0]) // Translate so that the top of the b
 rad_mount_3d(engrave_mode = 1);
 
 
-translate([37, 0])
-motherboard_fixture_3d();
+//translate([37, 0])
+//motherboard_fixture_3d();
+
+// TODO: 120 is a rough guess of X alignment.
+// Once floor mounting points are added, calculate actual offset.
+translate([120, 0])
+rotate(180, [0, 0, 1])
+compute_sled_3d();
