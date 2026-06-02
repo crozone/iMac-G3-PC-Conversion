@@ -358,15 +358,57 @@ gpu_mount_offset = motherboard_offset + [0, 35];
 
 // The main vertical back plate that everything mounts to.
 module main_plate_2d() {
+    module dual_m6_slot(spacing) {
+        union() {
+            translate([-spacing/2, 0])
+            rotate(-90)
+            slot_hole(d = M6_CLEARANCE_HOLE, length = 5);
+
+            translate([spacing/2, 0])
+            rotate(-90)
+            slot_hole(d = M6_CLEARANCE_HOLE, length = 5);
+        }
+    }
+
     // Height of gap between the floor and the bottem edge of the motherboard. 
-    base_offset = motherboard_offset[1] + 5;
+    base_offset = motherboard_offset[1] + 3;
+    corner_radius = 5;
 
     difference() {
-        // translate(plate_offset)
-        // square(plate_size);
+        union() {
+            // Main plate
+            translate(plate_offset + [0, base_offset])
+            rounded_square(plate_size - [0, base_offset], corners=[undef, corner_radius, corner_radius, corner_radius]);
+
+            // Left support plate
+            translate(plate_offset)
+            rounded_square([50, base_offset], corners=[corner_radius, corner_radius, undef, undef]);
+
+            // Right support plate
+            translate(plate_offset + [160, 0])
+            rounded_square([50, base_offset], corners=[corner_radius, corner_radius, undef, undef]);
+        }
 
         translate(plate_offset)
-        rounded_square(plate_size, corners=[undef, undef, 5, 5]);
+        union() {
+            // Bottom mounting slots, for floor mounting pieces
+            translate([50/2, 5 + 6/2 + 8])
+            dual_m6_slot(25);
+
+            translate([50/2 + 160, 5 + 6/2 + 8])
+            dual_m6_slot(25);
+
+            // Top mounting slots, for radiator mounting pieces
+            translate([50/2, plate_size[1] - 6/2 - 8])
+            dual_m6_slot(25);
+
+            translate([plate_size[0] - 50/2, plate_size[1] - 6/2 - 8])
+            dual_m6_slot(25);
+
+            // Top center slot for display bracket mounting piece (optional?)
+            translate([plate_size[0]/2, plate_size[1] - 6/2 - 8])
+            dual_m6_slot(60); // TODO: Verify spacing against display mounting bracket
+        }
 
         translate(motherboard_offset)
         union() {
@@ -379,11 +421,6 @@ module main_plate_2d() {
         translate(pump_offset)
         pump_mount_holes();
 
-        // PCIe cutout below motherboard
-        // Rounded square at top
-        translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - 25, 0])
-        rounded_square([110, motherboard_offset[1] + 5], corners=[undef,undef,2,2]);
-
         // GPU mount holes
         translate(gpu_mount_offset)
         translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset(), 0]) // Horizontally align PCIe slots
@@ -394,6 +431,15 @@ module main_plate_2d() {
                 circle(d = M4_DRILL_HOLE);
             }
         }
+    }
+}
+
+module slot_hole(d = undef, r = undef, length) {
+    d = is_undef(r) ? d : r * 2;
+    hull() {
+        circle(d = d);
+        translate([length, 0])
+        circle(d = d);
     }
 }
 
