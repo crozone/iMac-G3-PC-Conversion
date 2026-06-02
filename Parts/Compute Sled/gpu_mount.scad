@@ -22,6 +22,7 @@ use <../Shared/rounded_corner.scad>;
 use <../Shared/rounded_square.scad>;
 use <pcie_card_bracket.scad>;
 
+include <shared_values.scad>; // MINI_ITX_MOBO_MOUNTING_HOLES, MOTHERBOARD_OFFSET
 include <screw_hole_sizes.scad>
 include <../Shared/shared_settings.scad>;
 
@@ -158,6 +159,19 @@ function gpu_mount_pcie_datum_offset() = PCIE_SLOT_DATUM_OFFSET;
 // Provides the bracket mounting holes for scripts consuming this as a library with use
 function gpu_mount_mounting_holes() = MOUNTING_HOLES;
 
+module motherboard_screw_heads_cutout() {
+    scale([-1, 1])
+    translate([2, 0]) // Fudge. Why is this needed for alignment?!?!?!
+    translate(-GPU_MOUNT_OFFSET)
+    translate(MOTHERBOARD_OFFSET)
+    union() {
+        for(pos = MINI_ITX_MOBO_MOUNTING_HOLES) {
+            translate(pos)
+            circle(d = 6);
+        }
+    }
+}
+
 //
 // The primary plate that everything attaches to
 //
@@ -228,6 +242,9 @@ module base_plate_2d() {
             }
         }
 
+        // Clearance holes for the motherboard standoff screw heads on the back of the compute sled backboard.
+        motherboard_screw_heads_cutout();
+
         // Cutout for plastic support
         // 3mm from bottom of riser PCB, 7mm from the right):
         translate([-7, 4])
@@ -292,9 +309,8 @@ module riser_shim_plate_2d() {
         union() {
             rounded_square([147, 35], corners = [0, ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS]);
 
-            // TODO: Decide height
             translate([0, -8])
-            #rounded_square([15.5, 8], corners = [ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS, 0, 0]);
+            rounded_square([16.5, 8], corners = [ROUNDED_CORNER_RADIUS, ROUNDED_CORNER_RADIUS, 0, 0]);
         }
 
         // Mounting screw holes (M4)
@@ -306,13 +322,27 @@ module riser_shim_plate_2d() {
             }
         }
 
+        // Clearance holes for the motherboard standoff screw heads on the back of the compute sled backboard.
+        translate([PCIE_SLOT_DATUM_OFFSET, -RISER_Y_POS])
+        motherboard_screw_heads_cutout();
+
         // Cutout for PCIe edge connector locking tab thingy
         translate([-89 + 14.5 - 2, -5.5 - 7])
-        translate([-12, 0])
+        translate([-11, 0])
         hull() {
-        square([12, 2]);
-            translate([-(14 - 12), -4])
-            square([14, 4]);
+            square([11, 2]);
+            translate([-(12.95 - 11), -4])
+            square([12.95, 4]);
+        }
+
+        // Screws for PCIe edge connector locking tab
+        translate([-165 + PCIE_SLOT_DATUM_OFFSET, -5.5 - 7])
+        union() {
+            // TODO: Position
+            translate([4, -8/2])
+            #circle(d = M3_DRILL_HOLE);
+            translate([10, -8/2])
+            #circle(d = M3_DRILL_HOLE);
         }
 
         // Cutout for plastic support
@@ -832,10 +862,7 @@ module gpu_mount_3d() {
     }
 }
 
-if(RENDER_MODE == 0) {
-    gpu_mount_3d();
-}
-else if(RENDER_MODE == 1) {
+if(RENDER_MODE == 1) {
     // TODO
 }
 else if(RENDER_MODE == 2) {
@@ -857,23 +884,5 @@ else if(RENDER_MODE == 6) {
     if(ENGRAVE) side_plate_engrave_2d();
 }
 else {
-    // if(EXPORT_LAYER == 0 || EXPORT_LAYER == 1) {
-    //     base_plate_2d();
-
-    //     %translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS])
-    //     riser_reference_2d();
-    // }
-
-    // if(EXPORT_LAYER == 0 || EXPORT_LAYER == 2) {
-    //     // Engraver reference line
-    //     %translate([-1, RISER_Y_POS - 5.5 - 7])
-    //     square([1, 30]);
-    // }
-
-    // if(EXPORT_LAYER == 0) {
-    //     %rotate(180) {
-    //     pcie_card_reference_2d();
-    //     pcie_bracket_reference_top_down_2d();
-    //     }
-    // }
+    gpu_mount_3d();
 }
