@@ -32,56 +32,39 @@ use <../Shared/rounded_corner.scad>;
 use <../Shared/rounded_square.scad>;
 use <gpu_mount.scad>;
 
+include <shared_values.scad>; // MINI_ITX_MOBO_MOUNTING_HOLES, MOTHERBOARD_OFFSET
 include <screw_hole_sizes.scad>
 include <../Shared/shared_settings.scad>;
 
 // Render mode:
 //
 // 0: 3D visual
-// 1: 2D cutter layout
-// 2: 2D Main Plate
-// 3: 2D Bottom Plate
-// 4: 2D Rear Plate
+// 1: 2D all (arranged for cutting)
+// 2: 2D Main plate
 RENDER_MODE_DEFAULT = 0;
-
-// Engrave mode:
-//
-// 0: Model only
-// 1: Model and engrave
-// 2: Engrave only
-
-ENGRAVE_MODE_DEFAULT = 1;
+EXPORT_RENDER_MODE = 1;
 
 // Overridden by export script
-//
-// 1: Cut layert
+// 0: Both layers
+// 1: Cut layer
 // 2: Engrave layer
 
 EXPORT_LAYER = 0;
-
-EXPORT_RENDER_MODE = 1;
+CUT = (EXPORT_LAYER == 0) || (EXPORT_LAYER == 1);
+ENGRAVE = (EXPORT_LAYER == 0) || (EXPORT_LAYER == 2);
 
 if(EXPORT_LAYER != 0) {
     echo(str("EXPORT_LAYER enabled, set to ", EXPORT_LAYER));
 }
 
 RENDER_MODE = EXPORT_LAYER > 0 ? EXPORT_RENDER_MODE : RENDER_MODE_DEFAULT;
-ENGRAVE_MODE = EXPORT_LAYER == 1 ? 0 : (EXPORT_LAYER == 2 ? 2 : ENGRAVE_MODE_DEFAULT);
 
 echo(str("Render mode: ", RENDER_MODE));
-echo(str("Engrave mode: ", ENGRAVE_MODE));
 
 $fn = $preview ? 64 : 128;
 
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
-
-MINI_ITX_MOBO_MOUNTING_HOLES = [
-    [ 0,      0      ] + [10.16, 6.35], // Screw hole C, bottom left
-    [ 154.94, 0      ] + [10.16, 6.35], // Screw hole H, bottom right
-    [ 154.94, 157.48 ] + [10.16, 6.35], // Screw hole J, top right
-    [ 22.86,  157.48 ] + [10.16, 6.35]  // Screw hole F
-];
 
 MOTHERBOARD_PCIE_DATUM_POS = [10.16 + 46.94, 6.35 - 39.37/2 + 20.32];
 
@@ -349,12 +332,7 @@ module bulkhead_holes() {
     }
 }
 
-motherboard_offset = [0, 35];
 pump_offset = [170 + 50, 50];
-
-// GPU mount top is 270 above plane
-//gpu_mount_offset = [0, 70];
-gpu_mount_offset = motherboard_offset + [0, 35];
 
 // The main vertical back plate that everything mounts to.
 module main_plate_2d() {
@@ -371,7 +349,7 @@ module main_plate_2d() {
     }
 
     // Height of gap between the floor and the bottem edge of the motherboard. 
-    base_offset = motherboard_offset[1] + 3;
+    base_offset = MOTHERBOARD_OFFSET[1] + 3;
     corner_radius = 5;
 
     difference() {
@@ -410,7 +388,7 @@ module main_plate_2d() {
             dual_m6_slot(60); // TODO: Verify spacing against display mounting bracket
         }
 
-        translate(motherboard_offset)
+        translate(MOTHERBOARD_OFFSET)
         union() {
             for(pos = MINI_ITX_MOBO_MOUNTING_HOLES) {
                 translate(pos)
@@ -422,13 +400,13 @@ module main_plate_2d() {
         pump_mount_holes();
 
         // GPU mount holes
-        translate(gpu_mount_offset)
-        translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset(), 0]) // Horizontally align PCIe slots
+        translate(GPU_MOUNT_OFFSET)
+        translate([MOTHERBOARD_OFFSET[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset(), 0]) // Horizontally align PCIe slots
         scale([-1, 1])
         union() {
             for(pos = gpu_mount_mounting_holes()) {
                 translate(pos)
-                circle(d = M4_DRILL_HOLE);
+                #circle(d = M4_DRILL_HOLE);
             }
         }
     }
@@ -478,8 +456,8 @@ module compute_sled_3d() {
     }
 
     // GPU bracket
-    translate([gpu_mount_offset[0], 0, gpu_mount_offset[1]])
-    translate([motherboard_offset[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset() ,0]) // Horizontally align PCIe slots
+    translate([GPU_MOUNT_OFFSET[0], 0, GPU_MOUNT_OFFSET[1]])
+    translate([MOTHERBOARD_OFFSET[0] + MOTHERBOARD_PCIE_DATUM_POS[0] - gpu_mount_pcie_datum_offset() ,0]) // Horizontally align PCIe slots
     rotate(90, [1, 0, 0])
     rotate(180, [0, 1, 0])
     gpu_mount_3d();
@@ -487,7 +465,7 @@ module compute_sled_3d() {
     // Motherboard itself. It sits 8mm above the plate on standoffs.
     translate([0, -7.62, 0])
     rotate([90, 0, 0])
-    translate(motherboard_offset)
+    translate(MOTHERBOARD_OFFSET)
     union() {
         mini_itx_motherboard_3d();
 
@@ -506,4 +484,14 @@ module compute_sled_3d() {
     %pump_3d();
 }
 
-compute_sled_3d();
+if(RENDER_MODE == 1) {
+    // TODO
+}
+else if(RENDER_MODE == 2) {
+    if(CUT) main_plate_2d();
+    // TODO
+    //if(ENGRAVE) main_plate_engrave_2d();
+}
+else {
+    compute_sled_3d();
+}
