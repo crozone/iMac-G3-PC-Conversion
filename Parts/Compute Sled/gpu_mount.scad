@@ -807,6 +807,50 @@ module pcie_card_reference_3d() {
     pcie_card_reference_2d();
 }
 
+module waterblock_3d() {
+    // X = 0 is the edge of the waterblock
+    // Y = 0 is the bottom face of the PCIe mounting plate tab
+    // Z = 0 is the bottom face of the PCIe card PCB
+
+    translate([0, -92.19, 0])
+    union() {
+        // Main block
+        // translate([0, 0, -6])
+        // cube([235.95, 127.00, 34.22]);
+
+        translate([0, 0, -6.00 + 34.22 - 26.40])
+        linear_extrude(height = 23.9) 
+        rounded_square([235.95, 127.00], r = 5);
+
+        translate([0, 0, -6.00])
+        linear_extrude(height = 2) 
+        rounded_square([235.95, 127.00], r = 5);
+
+        // coolant connector
+        translate([86.16, 127.00, -6 + 34.22 - 15])
+        linear_extrude(height = 15) 
+        difference() {
+            rounded_square(
+                [235.95 - 86.15 - 68.61, 155.50 - 127.00],
+                corners = [undef, undef, 3, 3]
+                );
+
+            translate([109.75 - 86.16, 140.50 - 127.00])
+            circle(d = 13.16);
+
+            translate([143.75 - 86.16, 140.50 - 127.00])
+            circle(d = 13.16);
+        }
+
+        translate([109.75, 140.50, 0])
+        %cylinder(h = 40, r = 13.16);
+
+        translate([143.75, 140.50, 0])
+        %cylinder(h = 40, r = 13.16);
+    }
+
+}
+
 module gpu_mount_3d() {
     // Base plate
     base_plate_3d();
@@ -839,8 +883,12 @@ module gpu_mount_3d() {
     riser_reference_3d();
 
     translate([0, 0, PCIE_CARD_Z_OFFSET])
-    %rotate(180)
-    pcie_card_reference_3d();
+    rotate(180)
+    %pcie_card_reference_3d();
+
+    translate([-1, 0, PCIE_CARD_Z_OFFSET])
+    rotate(180)
+    %waterblock_3d();
 
     // PCIe bracket reference
     translate([0, 0, PCIE_CARD_Z_OFFSET])
