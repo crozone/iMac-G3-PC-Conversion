@@ -848,6 +848,16 @@ module waterblock_3d() {
         translate([143.75, 140.50, 0])
         %cylinder(h = 40, r = 13.16);
     }
+}
+
+// 12V-2x6 High Failure Rate Connector (please don't melt please don't melt)
+// Center at X = 210
+module power_cable_3d() {
+    translate([-20/2, 0, 0])
+    cube([20, 12, 20]);
+
+    translate([-20/2, (12 - 10)/2, -50])
+    #cube([20, 10, 50]);
 
 }
 
@@ -889,6 +899,11 @@ module gpu_mount_3d() {
     translate([-1, 0, PCIE_CARD_Z_OFFSET])
     rotate(180)
     %waterblock_3d();
+
+    translate([-1, 0, PCIE_CARD_Z_OFFSET])
+    rotate(180)
+    translate([210, -92.19 + 127.00, 0])
+    #power_cable_3d();
 
     // PCIe bracket reference
     translate([0, 0, PCIE_CARD_Z_OFFSET])
