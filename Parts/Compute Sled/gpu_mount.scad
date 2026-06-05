@@ -167,7 +167,7 @@ module motherboard_screw_heads_cutout() {
     union() {
         for(pos = MINI_ITX_MOBO_MOUNTING_HOLES) {
             translate(pos)
-            circle(d = 6);
+            circle(d = 8);
         }
     }
 }
