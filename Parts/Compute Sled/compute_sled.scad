@@ -41,7 +41,7 @@ include <../Shared/shared_settings.scad>;
 // 0: 3D visual
 // 1: 2D all (arranged for cutting)
 // 2: 2D Main plate
-RENDER_MODE_DEFAULT = 0;
+RENDER_MODE_DEFAULT = 2;
 EXPORT_RENDER_MODE = 1;
 
 // Overridden by export script
@@ -71,10 +71,6 @@ MOTHERBOARD_PCIE_DATUM_POS = [10.16 + 46.94, 6.35 - 39.37/2 + 20.32];
 material_thickness = 4.5;
 tab_height = material_thickness - 0.2;
 
-// TODO: Documentn what these are
-plate_screw_hole_diameter = 6.6;
-plate_screw_hole_distance = 55;
-
 // Overall size of the main motherboard mounting plate.
 plate_size =
 [
@@ -87,9 +83,10 @@ plate_size =
 // offsetting the plate allows for overhang.
 plate_offset = [-19, 0];
 
-// X is measured from middle of pump mount.
-// Y is measured from the bottom screw of pump mount.
-pump_pos = [50, 50];
+// Pump offset. Controls (x,y) offset of pump relative to the face of the motherboard backplate.
+// X = 0 is the centerline of the pump.
+// Y = 0 is the line bisecting the bottom two mounting screw holes on the pump bracket.
+pump_offset = [215, 70];
 
 // Settings for placeholder GTX 295
 gpu_y_start = 4;
@@ -127,16 +124,24 @@ module pump_3d() {
     union() {
         // Back
         translate([-66/2, 40, 24 - 32])
-        cube([66, 2, 32]);
+        translate([0, 2, 0])
+        rotate(90, [1,0,0])
+        linear_extrude(2)
+        difference() {
+            rounded_square([66, 32], corners = [2, 2, 0, 0]);
+            translate([66/2, 8])
+            pump_mount_holes();
+        }
 
         // Flat
         translate([0, 0, 24 - 2])
+        linear_extrude(2)
         hull() {
-            translate([-66/2, 40 - 5, 0])
-            cube([66, 5, 2]);
+            translate([-66/2, 40 - 5])
+            rounded_square([66, 5], corners = [1, 1, 0, 0]);
 
-            translate([-50/2, 40 - 17, 0])
-            cube([50, 17, 2]);
+            translate([-50/2, 40 - 17])
+            square([50, 17]);
         }
     }
 
@@ -195,21 +200,19 @@ module pump_3d() {
 }
 
 module pump_mount_holes() {
-
-    h_space = 54.3;
-    v_space = 13.5;
-    screw_hole_diameter = 3.5; // M3 screw
-
-    hole_positions = [
-        [h_space / 2, v_space],
-        [-h_space / 2, v_space],
-        [h_space / 2, 0],
-        [-h_space / 2, 0]
+    // Horizontal spacing = 54.3mm
+    // Vertical spacing = 13.5mm
+    PUMP_MOUNTING_HOLE_POS = 
+    [
+        [54.3 / 2, 13.5],
+        [-54.3 / 2, 13.5],
+        [54.3 / 2, 0],
+        [-54.3 / 2, 0]
     ];
 
-    for (this_pos = hole_positions) {
+    for (this_pos = PUMP_MOUNTING_HOLE_POS) {
         translate(this_pos)
-        circle(d = screw_hole_diameter);
+        circle(d = M3_CLEARANCE_HOLE);
     }
 }
 
@@ -224,27 +227,6 @@ module bulkhead_labels() {
 
         translate(bulkhead_hole_positions[1])
         text(text = "OUT", font = text_font, size = 3, halign = "center", valign = "top");
-    }
-}
-
-module mount_screw_holes() {
-    screw_hole_diameter = plate_screw_hole_diameter;
-    vertical_tolerance = 2;
-
-    hole_positions = [
-        [-plate_screw_hole_distance / 2, 0],
-        [0, 0],
-        [plate_screw_hole_distance / 2, 0]];
-
-    for (this_pos = hole_positions) {
-        translate(this_pos)
-        hull() {
-            translate([0, -vertical_tolerance / 2])
-            circle(d = screw_hole_diameter);
-
-            translate([0, vertical_tolerance / 2])
-            circle(d = screw_hole_diameter);
-        }
     }
 }
 
@@ -332,8 +314,6 @@ module bulkhead_holes() {
     }
 }
 
-pump_offset = [170 + 50, 50];
-
 // The main vertical back plate that everything mounts to.
 module main_plate_2d() {
     module dual_m6_slot(spacing) {
@@ -349,43 +329,51 @@ module main_plate_2d() {
     }
 
     // Height of gap between the floor and the bottem edge of the motherboard. 
-    base_offset = MOTHERBOARD_OFFSET[1] + 3;
+    base_offset = MOTHERBOARD_OFFSET[1] + 1;
     corner_radius = 5;
 
     difference() {
         union() {
             // Main plate
             translate(plate_offset + [0, base_offset])
-            rounded_square(plate_size - [0, base_offset], corners=[undef, corner_radius, corner_radius, corner_radius]);
+            rounded_square(plate_size - [0, base_offset], corners=[undef, undef, corner_radius, corner_radius]);
 
             // Left support plate
             translate(plate_offset)
             rounded_square([50, base_offset], corners=[corner_radius, corner_radius, undef, undef]);
 
             // Right support plate
-            translate(plate_offset + [160, 0])
-            rounded_square([50, base_offset], corners=[corner_radius, corner_radius, undef, undef]);
+            translate(plate_offset + [plate_size[0], 0] - [86, 0])
+            rounded_square([86, base_offset], corners=[corner_radius, corner_radius, undef, undef]);
         }
 
         translate(plate_offset)
         union() {
             // Bottom mounting slots, for floor mounting pieces
-            translate([50/2, 5 + 6/2 + 8])
+            // Bottom Left
+            translate([50/2, 20])
             dual_m6_slot(25);
 
-            translate([50/2 + 160, 5 + 6/2 + 8])
-            dual_m6_slot(25);
+            // Bottom Right
+            translate([plate_size[0] - 86/2, 20])
+            dual_m6_slot(60);
 
             // Top mounting slots, for radiator mounting pieces
-            translate([50/2, plate_size[1] - 6/2 - 8])
+            // Top left
+            translate([50/2, plate_size[1] - 12.5])
             dual_m6_slot(25);
 
-            translate([plate_size[0] - 50/2, plate_size[1] - 6/2 - 8])
+            // Top right
+            translate([plate_size[0] - 50/2, plate_size[1] - 12.5])
             dual_m6_slot(25);
 
             // Top center slot for display bracket mounting piece (optional?)
-            translate([plate_size[0]/2, plate_size[1] - 6/2 - 8])
+            translate([plate_size[0]/2, plate_size[1] - 12.5])
             dual_m6_slot(60); // TODO: Verify spacing against display mounting bracket
+
+            // Hole for GPU power cable to thread through
+            translate([plate_size[0] - 35/2 - 86/2, 12])
+            rounded_square([35, 23], r = 4);
         }
 
         translate(MOTHERBOARD_OFFSET)
@@ -415,8 +403,9 @@ module main_plate_2d() {
 module slot_hole(d = undef, r = undef, length) {
     d = is_undef(r) ? d : r * 2;
     hull() {
+        translate([-length/2, 0])
         circle(d = d);
-        translate([length, 0])
+        translate([length/2, 0])
         circle(d = d);
     }
 }
