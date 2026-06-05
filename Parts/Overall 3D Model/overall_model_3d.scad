@@ -19,32 +19,6 @@ $eps = pow(2, -15);
 
 tab_height = material_thickness; // Same as material thickness.
 
-// translate([0, 0, 230])
-// union() {
-//     top_mount_3d();
-
-//     tab_offset_a = 5 + 2.5;
-//     tab_offset_b = 5 + 2.5;
-
-//     translate([113 - (material_thickness / 2), 75 - 35 + tab_offset_a]) // 10mm inset from the oute edge of the tab
-//     rotate([0, 90, 0])
-//     rotate([0, 0, -90])
-//     angle_tab_3d(angle = 90 + radiator_angle, offset_a = tab_offset_a, offset_b = tab_offset_b);
-
-//     translate([-113 - (material_thickness / 2), 75 - 35 + tab_offset_a]) // 10mm inset from the oute edge of the tab
-//     rotate([0, 90, 0])
-//     rotate([0, 0, -90])
-//     angle_tab_3d(angle = 90 + radiator_angle, offset_a = tab_offset_a, offset_b = tab_offset_b);
-// }
-
-// translate([0, 75 - 30, 230])
-// translate([0, 0, 2])
-// rotate([-90 + radiator_angle, 0, 0])
-// rad_mount_3d();
-
-
-// -77
-
 // The X = -1 screw on the rad_bottom_mount is 85mm left of the center line
 neg_one_screw_x_offset = -85;
 
@@ -59,7 +33,6 @@ psu_origin_offset = -[-material_thickness - 15, -material_thickness - 3, 35];
 translate(psu_origin_offset)
 translate(zero_screw_hole_offset)
 psu_mount_3d();
-
 
 // BOTTOM RADIATOR MOUNT
 pivot_angle = 90 - radiator_angle;
