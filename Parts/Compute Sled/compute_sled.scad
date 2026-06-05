@@ -41,8 +41,8 @@ include <../Shared/shared_settings.scad>;
 // 0: 3D visual
 // 1: 2D all (arranged for cutting)
 // 2: 2D Main plate
-RENDER_MODE_DEFAULT = 2;
-EXPORT_RENDER_MODE = 1;
+RENDER_MODE_DEFAULT = 0;
+EXPORT_RENDER_MODE = 2;
 
 // Overridden by export script
 // 0: Both layers
