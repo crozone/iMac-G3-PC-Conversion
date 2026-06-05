@@ -212,7 +212,7 @@ module pump_mount_holes() {
 
     for (this_pos = PUMP_MOUNTING_HOLE_POS) {
         translate(this_pos)
-        circle(d = M3_CLEARANCE_HOLE);
+        circle(d = M3_DRILL_HOLE);
     }
 }
 
