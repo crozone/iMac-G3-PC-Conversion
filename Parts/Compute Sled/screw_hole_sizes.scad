@@ -21,4 +21,4 @@ M6_DRILL_HOLE = 5.0; // For tapping
 M8_DRILL_HOLE = 6.8; // For tapping
 
 // Other
-MINI_ITX_MOUNTING_CLEARANCE_HOLE = 3.96; // 0.16 inch (#6-32 UNC screws are used for the motherboard mounting)
+MINI_ITX_MOUNTING_CLEARANCE_HOLE = 3.66; // 0.144 inch (#6-32 UNC screws are used for the motherboard mounting and have a thread diameter of 0.138 inches = 3.51mm)
