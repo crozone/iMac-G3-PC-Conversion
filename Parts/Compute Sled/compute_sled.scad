@@ -405,7 +405,7 @@ module main_plate_2d() {
         union() {
             for(pos = MINI_ITX_MOBO_MOUNTING_HOLES) {
                 translate(pos)
-                circle(d = MINI_ITX_MOUNTING_CLEARANCE_HOLE);
+                circle(d = M3_DRILL_HOLE); // To tap, for M3 male-female threaded standoff screwed directly into the plate.
             }
         }
 
