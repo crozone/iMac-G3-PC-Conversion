@@ -68,7 +68,7 @@ $eps = pow(2, -15);
 
 MOTHERBOARD_PCIE_DATUM_POS = [10.16 + 46.94, 6.35 - 39.37/2 + 20.32];
 
-material_thickness = 4.5;
+material_thickness = 6;
 tab_height = material_thickness - 0.2;
 
 // Overall size of the main motherboard mounting plate.
