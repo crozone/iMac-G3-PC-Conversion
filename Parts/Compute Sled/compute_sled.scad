@@ -41,6 +41,8 @@ include <../Shared/shared_settings.scad>;
 // 0: 3D visual
 // 1: 2D all (arranged for cutting)
 // 2: 2D Main plate
+// 3: GPU support 3080 TUF Vector
+// 4: GPU support 5090 TUF Alphacool
 RENDER_MODE_DEFAULT = 0;
 EXPORT_RENDER_MODE = 2;
 
@@ -108,6 +110,16 @@ module module_label(submodule_name) {
 
         translate([0, -4])
         text(text = text_line2, font = text_font, size = 2, halign = "center", valign = "top");
+    }
+}
+
+module slot_hole(d = undef, r = undef, length) {
+    d = is_undef(r) ? d : r * 2;
+    hull() {
+        translate([-length/2, 0])
+        circle(d = d);
+        translate([length/2, 0])
+        circle(d = d);
     }
 }
 
@@ -374,6 +386,19 @@ module main_plate_2d() {
             // Hole for GPU power cable to thread through
             translate([plate_size[0] - 35/2 - 86/2, 12])
             rounded_square([35, 23], r = 4);
+
+            // Thread hole for GPU support block
+            translate([plate_size[0], 170])
+            union()
+            {
+                translate([-25, 0])
+                rotate(90)
+                slot_hole(length = 20, d = M6_CLEARANCE_HOLE);
+
+                translate([-65, 0])
+                rotate(90)
+                slot_hole(length = 20, d = M6_CLEARANCE_HOLE);
+            }
         }
 
         translate(MOTHERBOARD_OFFSET)
@@ -400,13 +425,41 @@ module main_plate_2d() {
     }
 }
 
-module slot_hole(d = undef, r = undef, length) {
-    d = is_undef(r) ? d : r * 2;
-    hull() {
-        translate([-length/2, 0])
-        circle(d = d);
-        translate([length/2, 0])
-        circle(d = d);
+module gpu_support_block_3080_vector_3d() {
+    // 3080 with EK vector waterblock:
+    // thickness: 20.3mm
+    // back spacing: 6mm
+    // Card is flush along bottom with block
+
+    // Screw holes at -25 and -65
+    // M6 insert
+
+    difference() {
+        hull() {
+            translate([-77.5, -15, -15])
+            linear_extrude(h = 15)
+            translate([0, 0])
+            rounded_square([65, 35], r = 5);
+
+            translate([-77.5, -15, -30])
+            linear_extrude(h = 30)
+            translate([0, 0])
+            rounded_square([65, 20], r = 5);
+        }
+
+        // Blind hole for Heat Set Insert M6 x 12.7
+        translate([0, 10, 0]) 
+        union() {
+            translate([-25, 0, -13.7]) 
+            cylinder(h = 13.7 + 0.01, d = 8.1);
+
+            translate([-65, 0, -13.7]) 
+            cylinder(h = 13.7 + 0.01, d = 8.1);
+        }
+
+        translate([-100, -100, -20.3 - 6])
+        cube([100, 100, 20.3]);
+
     }
 }
 
@@ -462,7 +515,7 @@ module compute_sled_3d() {
         translate([0, 6.60, 1])
         cube([35, 158.75, 43]);
 
-        // EK waterblock
+        // EK motherboard monoblock
         color("green")
         translate([-1, 15, 0]) // TODO: Approximate, needs measurement
         ek_monoblock_3d();
@@ -471,6 +524,11 @@ module compute_sled_3d() {
     // Pump reference model
     translate([pump_offset[0], -42 - material_thickness, pump_offset[1]])
     %pump_3d();
+
+    rotate(90, [1,0,0])
+    translate(plate_offset + [plate_size[0], GPU_MOUNT_OFFSET[1] + 100.36 - 8])
+    gpu_support_block_3080_vector_3d();
+
 }
 
 if(RENDER_MODE == 1) {
@@ -480,6 +538,9 @@ else if(RENDER_MODE == 2) {
     if(CUT) main_plate_2d();
     // TODO
     //if(ENGRAVE) main_plate_engrave_2d();
+}
+else if (RENDER_MODE == 3) {
+    gpu_support_block_3080_vector_3d();
 }
 else {
     compute_sled_3d();
