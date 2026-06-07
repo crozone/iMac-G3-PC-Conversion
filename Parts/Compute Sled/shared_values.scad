@@ -12,4 +12,5 @@ MINI_ITX_MOBO_MOUNTING_HOLES = [
 MOTHERBOARD_OFFSET = [0, 35];
 
 // GPU mount top is 270 above plane
-GPU_MOUNT_OFFSET = MOTHERBOARD_OFFSET + [0, 32];
+// At Y offset = -60 the two PCIe slots are horizntal to each other.
+GPU_MOUNT_OFFSET = [0, 67];
