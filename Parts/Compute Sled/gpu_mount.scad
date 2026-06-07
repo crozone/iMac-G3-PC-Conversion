@@ -159,19 +159,6 @@ function gpu_mount_pcie_datum_offset() = PCIE_SLOT_DATUM_OFFSET;
 // Provides the bracket mounting holes for scripts consuming this as a library with use
 function gpu_mount_mounting_holes() = MOUNTING_HOLES;
 
-module motherboard_screw_heads_cutout() {
-    scale([-1, 1])
-    translate([2, 0]) // Fudge. Why is this needed for alignment?!?!?!
-    translate(-GPU_MOUNT_OFFSET)
-    translate(MOTHERBOARD_OFFSET)
-    union() {
-        for(pos = MINI_ITX_MOBO_MOUNTING_HOLES) {
-            translate(pos)
-            circle(d = 8);
-        }
-    }
-}
-
 //
 // The primary plate that everything attaches to
 //
@@ -241,9 +228,6 @@ module base_plate_2d() {
                 circle(d = M4_CLEARANCE_HOLE);
             }
         }
-
-        // Clearance holes for the motherboard standoff screw heads on the back of the compute sled backboard.
-        motherboard_screw_heads_cutout();
 
         // Cutout for plastic support
         // 3mm from bottom of riser PCB, 7mm from the right):
@@ -321,10 +305,6 @@ module riser_shim_plate_2d() {
                 circle(d = M4_CLEARANCE_HOLE);
             }
         }
-
-        // Clearance holes for the motherboard standoff screw heads on the back of the compute sled backboard.
-        translate([PCIE_SLOT_DATUM_OFFSET, -RISER_Y_POS])
-        motherboard_screw_heads_cutout();
 
         // Cutout for PCIe edge connector locking tab thingy
         translate([-89 + 14.5 - 2, -5.5 - 7])
