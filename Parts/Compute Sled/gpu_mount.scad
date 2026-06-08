@@ -61,6 +61,11 @@ echo(str("Render mode: ", RENDER_MODE));
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
 
+PCIE_NONE = 0;
+PCIE_GENERIC = 1;
+PCIE_RTX_3080_TUF_EK_VECTOR = 1;
+PCIE_RTX_5090_TUF_ALPHACOOL = 2;
+
 // The thickness of the acrylic sheet being cut
 MATERIAL_THICKNESS = 6;
 
@@ -79,7 +84,7 @@ TAB_LENGTH = MATERIAL_THICKNESS - TAB_MARGIN;
 // The distance from the PCIe slot datum (the tab in between the power and data parts of the PCIe slot) and the outer face of the PCIe card bracket (from specification)
 PCIE_SLOT_DATUM_OFFSET = 59.05;
 
-// PCIe bracket height from screw mounting face to lower edge of PCB (from specification)
+// PCIe bracket height from screw mounting face to lower edge of PCB (from specification). The bottom edge of the PCB is 8mm less than this.
 PCIE_BRACKET_HEIGHT = 100.36;
 
 // Tweaks for the PCIe bracket IO cutout dimensions.
@@ -128,8 +133,10 @@ RISER_SHIM_HEIGHT = 3;
 // The Z height of the bottom of the PCIe card PCB.
 PCIE_CARD_Z_OFFSET = MATERIAL_THICKNESS + RISER_SHIM_HEIGHT;
 
+PCIE_CARD_THICKNESS = 1.57; // PCIe card PCB thickness is standardised at 1.57mm
+
 // The height of the horizontal plates. Must be large enough to provide clearance for the PCIe brackets and IO connectors.
-HORIZONTAL_PLATE_HEIGHT = (PCIE_CARDS * PCIE_SPACING_PER_CARD) - (PCIE_SPACING_PER_CARD - (1.57 + 0.35 + 12.06)) + RISER_SHIM_HEIGHT + 3;
+HORIZONTAL_PLATE_HEIGHT = (PCIE_CARDS * PCIE_SPACING_PER_CARD) - (PCIE_SPACING_PER_CARD - (PCIE_CARD_THICKNESS + 0.35 + 12.06)) + RISER_SHIM_HEIGHT + 3;
 
 SCREW_PLATE_EXTRA_HEIGHT = 7;
 SCREW_PLATE_HEIGHT = HORIZONTAL_PLATE_HEIGHT + SCREW_PLATE_EXTRA_HEIGHT;
@@ -602,9 +609,7 @@ module riser_reference_2d() {
     }
 }
 
-//!pcie_card_reference_2d();
-
-module pcie_card_reference_2d() {
+module pcie_card_reference_2d(size) {
     translate([0, -PCIE_BRACKET_HEIGHT])
     difference() {
         union() {
@@ -643,7 +648,7 @@ module pcie_card_reference_2d() {
                 square([4.05, 8]);
 
                 translate([17 - 2 + 2, 8])
-                square([232 - 17 - 2, 127]); // 5090 TUF PCB measurements
+                square(size - [17 - 2 + 2, 0]); 
             }
 
             // Locking tab
@@ -652,17 +657,16 @@ module pcie_card_reference_2d() {
             translate([1 + 71, 0])
             union() {
                 translate([4, 0]) 
-            #hull() {
-                translate([0, -1])
-                square([10, 2.5]);
+                hull() {
+                    translate([0, -1])
+                    square([10, 2.5]);
 
-                translate([0, -1 + 2.5])
-                square([12, 2.5]);
-            }
+                    translate([0, -1 + 2.5])
+                    square([12, 2.5]);
+                }
             
-            %translate([0, -1])
-            square([4, 9]);
-
+                translate([0, -1])
+                square([4, 9]);
             }
         }
 
@@ -695,6 +699,11 @@ module pcie_card_reference_2d() {
         // TODO
         
     }
+}
+
+module pcie_card_reference_3d(size  = [167.65, 111.15]) {
+    linear_extrude(height = PCIE_CARD_THICKNESS)
+    pcie_card_reference_2d(size);
 }
 
 module pcie_bracket_reference_top_down_2d() {
@@ -781,12 +790,64 @@ module riser_reference_3d() {
     }
 }
 
-module pcie_card_reference_3d() {
-    linear_extrude(height = 1.57)
-    pcie_card_reference_2d();
+// Reference model for the RTX 3080 TUF EK Quantum Vector waterblock
+// Waterblock: https://www.ekwb.com/shop/EK-IM/EK-IM-3831109832608.pdf
+// Backplate:  https://www.ekwb.com/shop/EK-IM/EK-IM-3831109832639.pdf
+module waterblock_3080_tuf_ek_vector_3d() {
+    // X = 0 is the edge of the waterblock
+    // Y = 0 is the bottom face of the PCIe mounting plate tab
+    // Z = 0 is the bottom face of the PCIe card PCB
+
+    // Total measured thickness: 20.3mm
+
+    // Backplate: 254.70mm x 119.40mm x 5.20
+    // Backplate 5.20 thickness includes PCB thickness
+    // Backplate behind PCB is measured impirically at 4.13 (20.3 - 14.6 - 1.57)
+    backplate_thickness = 20.3 - 14.6 - PCIE_CARD_THICKNESS;
+    translate([0, -PCIE_BRACKET_HEIGHT + 8, -backplate_thickness])
+    cube([254.70, 119.40, backplate_thickness]);
+
+    translate([0, -PCIE_BRACKET_HEIGHT + 8, PCIE_CARD_THICKNESS])
+    linear_extrude(height = 14.6)
+    union() {
+        // Waterblock
+        // Main block is same width as backplate (254.70), and 15mm longer than PCB length
+        // Waterblock is 14.6mm higher than PCB top surface.
+        rounded_square([254.70 - 10, 119.40], corners = [1, 0, 0, 1]);
+
+        // Extra cap
+        translate([254.70 - 10, 0])
+        union() {
+            hull() {
+                rounded_square([4, 119.40], corners = [undef, 1, 1, undef]);
+
+                translate([0, 6])
+                rounded_square([10, 60], corners = [undef, 3, undef, undef]);
+            }
+
+            hull() {
+                translate([0, 119.40 - 45])
+                rounded_square([4, 45], corners = [undef, undef, 1, undef]);
+
+                translate([0, 68])
+                rounded_square([22, 103 - 68], corners = [undef, 3, 3, undef]);
+            }
+
+            hull() {
+                translate([0, 60])
+                square([10, 37]);
+
+                translate([0, 68])
+                rounded_square([22, 103 - 68], corners = [undef, 3, 3, undef]);
+            }
+        }
+    }
+
+    // Longest point = 267mm
 }
 
-module waterblock_3d() {
+// Reference model for the RTX 5090 TUF Alphacool waterblock
+module waterblock_5090_tuf_alphacool_3d() {
     // X = 0 is the edge of the waterblock
     // Y = 0 is the bottom face of the PCIe mounting plate tab
     // Z = 0 is the bottom face of the PCIe card PCB
@@ -794,13 +855,11 @@ module waterblock_3d() {
     translate([0, -92.19, 0])
     union() {
         // Main block
-        // translate([0, 0, -6])
-        // cube([235.95, 127.00, 34.22]);
-
         translate([0, 0, -6.00 + 34.22 - 26.40])
         linear_extrude(height = 23.9) 
         rounded_square([235.95, 127.00], r = 5);
 
+        // Backplate
         translate([0, 0, -6.00])
         linear_extrude(height = 2) 
         rounded_square([235.95, 127.00], r = 5);
@@ -829,18 +888,41 @@ module waterblock_3d() {
     }
 }
 
-// 12V-2x6 High Failure Rate Connector (please don't melt please don't melt)
-// Center at X = 210
-module power_cable_3d() {
-    translate([-20/2, 0, 0])
-    cube([20, 12, 20]);
-
-    translate([-20/2, (12 - 10)/2, -50])
-    #cube([20, 10, 50]);
-
+module reference_pcie_card_generic() {
+    pcie_card_reference_3d();
 }
 
-module gpu_mount_3d() {
+module reference_pcie_card_3080_tuf_ek_vector_3d() {
+    union() {
+        color("forestgreen")
+        pcie_card_reference_3d([254.70 - 15, 119.40]);
+
+        color("teal")
+        waterblock_3080_tuf_ek_vector_3d();
+    }
+}
+
+module reference_pcie_card_5090_tuf_alphacool_3d() {
+    waterblock_5090_tuf_alphacool_3d();
+    color("green")
+    pcie_card_reference_3d([232 - 17 - 2, 127]);
+
+    // Power cable
+    translate([210, -92.19 + 127.00, 0])
+    #power_cable_3d();
+
+    // 12V-2x6 High Failure Rate Connector (please don't melt please don't melt)
+    // Center at X = 210
+    module power_cable_3d() {
+        translate([-20/2, 0, 0])
+        cube([20, 12, 20]);
+
+        translate([-20/2, (12 - 10)/2, -50])
+        #cube([20, 10, 50]);
+    }
+}
+
+module gpu_mount_3d(pcie_card = PCIE_GENERIC) {
     // Base plate
     base_plate_3d();
 
@@ -871,18 +953,21 @@ module gpu_mount_3d() {
     %translate([-PCIE_SLOT_DATUM_OFFSET, RISER_Y_POS, PCIE_CARD_Z_OFFSET])
     riser_reference_3d();
 
-    translate([0, 0, PCIE_CARD_Z_OFFSET])
-    rotate(180)
-    %pcie_card_reference_3d();
-
-    translate([-1, 0, PCIE_CARD_Z_OFFSET])
-    rotate(180)
-    %waterblock_3d();
-
-    translate([-1, 0, PCIE_CARD_Z_OFFSET])
-    rotate(180)
-    translate([210, -92.19 + 127.00, 0])
-    #power_cable_3d();
+    if(pcie_card == PCIE_GENERIC) {
+        translate([-1, 0, PCIE_CARD_Z_OFFSET])
+        rotate(180)
+        %reference_pcie_card_generic();
+    }
+    if(pcie_card == PCIE_RTX_3080_TUF_EK_VECTOR) {
+        translate([-1, 0, PCIE_CARD_Z_OFFSET])
+        rotate(180)
+        %reference_pcie_card_3080_tuf_ek_vector_3d();
+    }
+    else if(pcie_card == PCIE_RTX_5090_TUF_ALPHACOOL) {
+        translate([-1, 0, PCIE_CARD_Z_OFFSET])
+        rotate(180)
+        %reference_pcie_card_5090_tuf_alphacool_3d();
+    }
 
     // PCIe bracket reference
     translate([0, 0, PCIE_CARD_Z_OFFSET])
@@ -926,5 +1011,5 @@ else if(RENDER_MODE == 6) {
     if(ENGRAVE) side_plate_engrave_2d();
 }
 else {
-    gpu_mount_3d();
+    gpu_mount_3d(PCIE_RTX_3080_TUF_EK_VECTOR);
 }
