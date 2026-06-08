@@ -446,6 +446,11 @@ module gpu_support_block_3080_vector_3d() {
     // Screw holes at -25 and -65
     // M6 insert
 
+    // TOOD: These values are only available in GPU mount
+    // Should this be over there instead?
+    backplate_thickness = 20.3 - 14.6 - 1.57;
+    PCIE_CARD_Z_OFFSET = 6 + 3;
+
     difference() {
         hull() {
             translate([-77.5, -15, -15])
@@ -469,9 +474,8 @@ module gpu_support_block_3080_vector_3d() {
             cylinder(h = 13.7 + 0.01, d = 8.1);
         }
 
-        translate([-100, -100, -20.3 - 6])
+        translate([-100, -100, -20.3 - PCIE_CARD_Z_OFFSET + backplate_thickness])
         cube([100, 100, 20.3]);
-
     }
 }
 
