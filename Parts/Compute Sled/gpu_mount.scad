@@ -22,7 +22,6 @@ use <../Shared/rounded_corner.scad>;
 use <../Shared/rounded_square.scad>;
 use <pcie_card_bracket.scad>;
 
-include <shared_values.scad>; // MINI_ITX_MOBO_MOUNTING_HOLES, MOTHERBOARD_OFFSET
 include <screw_hole_sizes.scad>
 include <../Shared/shared_settings.scad>;
 

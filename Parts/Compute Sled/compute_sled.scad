@@ -32,7 +32,6 @@ use <../Shared/rounded_corner.scad>;
 use <../Shared/rounded_square.scad>;
 use <gpu_mount.scad>;
 
-include <shared_values.scad>; // MINI_ITX_MOBO_MOUNTING_HOLES, MOTHERBOARD_OFFSET
 include <screw_hole_sizes.scad>
 include <../Shared/shared_settings.scad>;
 
@@ -68,7 +67,20 @@ $fn = $preview ? 64 : 128;
 // A very small distance to overcome rounding errors
 $eps = pow(2, -15);
 
+
+MINI_ITX_MOBO_MOUNTING_HOLES = [
+    [ 0,      0      ] + [10.16, 6.35], // Screw hole C, bottom left
+    [ 154.94, 0      ] + [10.16, 6.35], // Screw hole H, bottom right
+    [ 154.94, 157.48 ] + [10.16, 6.35], // Screw hole J, top right
+    [ 22.86,  157.48 ] + [10.16, 6.35]  // Screw hole F
+];
+
+MOTHERBOARD_OFFSET = [0, 35];
 MOTHERBOARD_PCIE_DATUM_POS = [10.16 + 46.94, 6.35 - 39.37/2 + 20.32];
+
+// GPU mount top is 270 above plane
+// At Y offset = -60 the two PCIe slots are horizntal to each other.
+GPU_MOUNT_OFFSET = [0, 67];
 
 material_thickness = 6;
 tab_height = material_thickness - 0.2;
