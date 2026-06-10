@@ -375,11 +375,11 @@ module main_plate_2d() {
         union() {
             // Bottom mounting slots, for floor mounting pieces
             // Bottom Left
-            translate([50/2, 20])
+            translate([55/2, 15])
             dual_m6_slot(25);
 
             // Bottom Right
-            translate([plate_size[0] - 86/2, 20])
+            translate([plate_size[0] - 86/2, 15])
             dual_m6_slot(60);
 
             // Top mounting slots, for radiator mounting pieces
