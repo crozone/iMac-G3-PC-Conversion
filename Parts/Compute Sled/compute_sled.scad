@@ -364,7 +364,7 @@ module main_plate_2d() {
 
             // Left support plate
             translate(plate_offset)
-            rounded_square([50, base_offset], corners=[corner_radius, corner_radius, undef, undef]);
+            rounded_square([55, base_offset], corners=[corner_radius, corner_radius, undef, undef]);
 
             // Right support plate
             translate(plate_offset + [plate_size[0], 0] - [86, 0])
